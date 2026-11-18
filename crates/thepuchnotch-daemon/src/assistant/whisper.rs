@@ -10,9 +10,9 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 
 use anyhow::Context;
-use thepuchnotch_core::speech::{MODELS, MODELS_DIR, model_file};
 use log::{info, warn};
 use serde_json::Value;
+use thepuchnotch_core::speech::{MODELS, MODELS_DIR, model_file};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader, Lines};
 use tokio::process::{ChildStdin, ChildStdout, Command};
 
@@ -70,8 +70,13 @@ pub fn report() -> String {
             models.join(", "),
             probe(&native)
         ),
-        Some(_) => "  Speech recognition: no speech model yet (run thepuchnotch-setup-voice)".to_owned(),
-        None => "  Speech recognition: thepuchnotch-whisper is missing (install thepuchnotch again)".to_owned(),
+        Some(_) => {
+            "  Speech recognition: no speech model yet (run thepuchnotch-setup-voice)".to_owned()
+        }
+        None => {
+            "  Speech recognition: thepuchnotch-whisper is missing (install thepuchnotch again)"
+                .to_owned()
+        }
     }
 }
 

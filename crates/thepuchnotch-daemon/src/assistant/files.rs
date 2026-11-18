@@ -399,7 +399,8 @@ mod tests {
 
     /// A made-up home folder of its own for each test, as tests run side by side.
     fn tree(test: &str) -> PathBuf {
-        let home = std::env::temp_dir().join(format!("thepuchnotch-files-{}-{test}", std::process::id()));
+        let home =
+            std::env::temp_dir().join(format!("thepuchnotch-files-{}-{test}", std::process::id()));
         for path in [
             "Downloads/TTD Ana final.png",
             "Downloads/laporan.pdf",

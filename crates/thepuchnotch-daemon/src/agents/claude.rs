@@ -182,7 +182,14 @@ mod tests {
     #[test]
     fn a_moved_thepuchnotchd_is_followed() {
         let mut settings = json!({});
-        assert!(add_hooks(&mut settings, "/old/thepuchnotchd --agent-hook claude", &SPEC).unwrap());
+        assert!(
+            add_hooks(
+                &mut settings,
+                "/old/thepuchnotchd --agent-hook claude",
+                &SPEC
+            )
+            .unwrap()
+        );
         assert!(add_hooks(&mut settings, COMMAND, &SPEC).unwrap());
         assert!(!add_hooks(&mut settings, COMMAND, &SPEC).unwrap());
         assert_eq!(settings["hooks"]["Stop"].as_array().unwrap().len(), 1);

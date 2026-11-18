@@ -68,7 +68,8 @@ pub mod tests {
 
     /// A fresh, empty directory for one test.
     pub fn scratch(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("thepuchnotch-agents-{}-{name}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("thepuchnotch-agents-{}-{name}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         dir

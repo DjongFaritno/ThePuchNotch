@@ -11,9 +11,9 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 use std::time::Duration;
 
-use thepuchnotch_core::shelf::ShelfItem;
 use serde::Serialize;
 use subtle::ConstantTimeEq;
+use thepuchnotch_core::shelf::ShelfItem;
 use tokio::sync::watch;
 use tokio::time::Instant;
 

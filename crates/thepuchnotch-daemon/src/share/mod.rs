@@ -15,10 +15,10 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use futures_util::StreamExt;
-use thepuchnotch_core::shelf::ShelfItem;
 use log::warn;
 use qrcode::{Color, EcLevel, QrCode};
 use serde_json::json;
+use thepuchnotch_core::shelf::ShelfItem;
 use tokio::sync::watch;
 use zbus::message::Header;
 use zbus::object_server::{InterfaceRef, SignalEmitter};

@@ -501,8 +501,10 @@ mod tests {
 
     #[test]
     fn sees_an_answer_given_in_the_terminal() {
-        let path =
-            std::env::temp_dir().join(format!("thepuchnotch-transcript-{}.jsonl", std::process::id()));
+        let path = std::env::temp_dir().join(format!(
+            "thepuchnotch-transcript-{}.jsonl",
+            std::process::id()
+        ));
         let input = json!({"command": "npm test", "description": "Run the tests"});
         let call = json!({"type": "assistant", "message": {"content": [
             {"type": "tool_use", "id": "toolu_older", "name": "Bash", "input": {"command": "ls"}},

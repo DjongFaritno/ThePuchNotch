@@ -91,8 +91,12 @@ mod tests {
 
     #[test]
     fn a_renewed_sign_in_goes_back_and_an_old_copy_is_replaced() {
-        let root = std::env::temp_dir().join(format!("thepuchnotch-sign-in-{}", std::process::id()));
-        let (real, linked) = (root.join("user/auth.json"), root.join("thepuchnotch/auth.json"));
+        let root =
+            std::env::temp_dir().join(format!("thepuchnotch-sign-in-{}", std::process::id()));
+        let (real, linked) = (
+            root.join("user/auth.json"),
+            root.join("thepuchnotch/auth.json"),
+        );
         fs::create_dir_all(real.parent().unwrap()).unwrap();
         // Not signed in yet: nothing to link.
         share(&real, &linked);

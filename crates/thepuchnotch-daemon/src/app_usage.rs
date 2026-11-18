@@ -5,8 +5,8 @@
 //! for a month, in `~/.local/share/thepuchnotch/app-usage.json`, and shown on the Apps page.
 
 use chrono::{Local, TimeZone};
-use thepuchnotch_core::app_usage::{AppTotal, AppUsage, KEEP_DAYS, MAX_REPORT_MS};
 use serde::{Deserialize, Serialize};
+use thepuchnotch_core::app_usage::{AppTotal, AppUsage, KEEP_DAYS, MAX_REPORT_MS};
 use tokio::sync::Notify;
 use zbus::object_server::InterfaceRef;
 use zbus::zvariant::Type;

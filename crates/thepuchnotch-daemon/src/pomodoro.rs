@@ -3,9 +3,11 @@
 
 use std::sync::Arc;
 
-use thepuchnotch_core::pomodoro::{FocusStats, Phase, Pomodoro, PomodoroConfig, PomodoroView, TimerState};
 use log::warn;
 use serde::Serialize;
+use thepuchnotch_core::pomodoro::{
+    FocusStats, Phase, Pomodoro, PomodoroConfig, PomodoroView, TimerState,
+};
 use tokio::sync::Notify;
 use zbus::object_server::{InterfaceRef, SignalEmitter};
 use zbus::{fdo, interface};

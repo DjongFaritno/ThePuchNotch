@@ -321,7 +321,9 @@ fn run_command(answer: &Answer) -> Result<String, String> {
 /// A folder of made-up files for the search cases, in plain sight as the user's own would be; the
 /// eval deletes it when done.
 fn fixture() -> std::path::PathBuf {
-    let dir = dirs::home_dir().unwrap_or_default().join("thepuchnotch-eval-files");
+    let dir = dirs::home_dir()
+        .unwrap_or_default()
+        .join("thepuchnotch-eval-files");
     for name in [
         "TTD Ana final.png",
         "laporan keuangan.pdf",
@@ -640,13 +642,17 @@ fn cases() -> Vec<Case> {
             }
         }),
         // An agent: it searches this computer itself, then shows what it found.
-        case(&["cari tanda tanganku di folder ~/thepuchnotch-eval-files"], |a| {
-            shown(a, "TTD Ana final.png")
-        }),
-        case(&["find my CV in ~/thepuchnotch-eval-files and open it"], |a| {
-            shown(a, "CV Firdaus 2026.pdf")?;
-            english(last(a))
-        }),
+        case(
+            &["cari tanda tanganku di folder ~/thepuchnotch-eval-files"],
+            |a| shown(a, "TTD Ana final.png"),
+        ),
+        case(
+            &["find my CV in ~/thepuchnotch-eval-files and open it"],
+            |a| {
+                shown(a, "CV Firdaus 2026.pdf")?;
+                english(last(a))
+            },
+        ),
         case(
             &["file apa aja yang paling baru di ~/thepuchnotch-eval-files"],
             |a| {
@@ -1287,10 +1293,11 @@ fn cases() -> Vec<Case> {
 
 /// Runs the turns of `case` in one new conversation, as thepuchnotchd would; an error ends the case with it.
 async fn run(case: &Case) -> Result<Vec<Answer>, String> {
-    let model = std::env::var("THEPUCHNOTCH_EVAL_MODEL").unwrap_or_else(|_| match eval_provider() {
-        Provider::Agy => "gemini-3.8-flash-low".into(),
-        _ => String::new(),
-    });
+    let model =
+        std::env::var("THEPUCHNOTCH_EVAL_MODEL").unwrap_or_else(|_| match eval_provider() {
+            Provider::Agy => "gemini-3.8-flash-low".into(),
+            _ => String::new(),
+        });
     let mut session = Session {
         context: Context {
             apps: APPS.iter().map(|app| app.to_string()).collect(),

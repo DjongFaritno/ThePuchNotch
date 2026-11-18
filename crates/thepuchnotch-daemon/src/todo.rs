@@ -3,8 +3,8 @@
 
 use std::sync::Arc;
 
-use thepuchnotch_core::todo::TodoList;
 use log::warn;
+use thepuchnotch_core::todo::TodoList;
 use tokio::sync::Notify;
 use zbus::object_server::{InterfaceRef, SignalEmitter};
 use zbus::{fdo, interface};

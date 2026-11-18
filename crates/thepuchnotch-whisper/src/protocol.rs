@@ -55,7 +55,10 @@ mod tests {
     #[test]
     fn reads_the_audio_path() {
         let path = request(r#"{"audio": "/run/user/1000/thepuchnotch-voice-7.pcm"}"#).unwrap();
-        assert_eq!(path, PathBuf::from("/run/user/1000/thepuchnotch-voice-7.pcm"));
+        assert_eq!(
+            path,
+            PathBuf::from("/run/user/1000/thepuchnotch-voice-7.pcm")
+        );
     }
 
     #[test]

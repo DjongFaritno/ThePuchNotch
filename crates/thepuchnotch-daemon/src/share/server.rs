@@ -10,9 +10,9 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Duration;
 
-use thepuchnotch_core::shelf::{CAPACITY, ShelfItem};
 use log::{debug, info};
 use serde_json::json;
+use thepuchnotch_core::shelf::{CAPACITY, ShelfItem};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::watch;

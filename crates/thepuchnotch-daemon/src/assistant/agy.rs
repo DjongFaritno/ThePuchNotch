@@ -358,7 +358,8 @@ mod tests {
     #[test]
     fn either_versions_sign_in_counts() {
         // Its own folder: the tests run at once, and another removes its own when done.
-        let home = std::env::temp_dir().join(format!("thepuchnotch-agy-signed-in-{}", std::process::id()));
+        let home =
+            std::env::temp_dir().join(format!("thepuchnotch-agy-signed-in-{}", std::process::id()));
         std::fs::create_dir_all(home.join(".gemini/antigravity-cli")).unwrap();
         assert!(!signed_in_at(&home));
         // agy 1.4 and later.
@@ -375,7 +376,8 @@ mod tests {
     #[test]
     fn prunes_whole_conversations_last_used_before_today() {
         // Not store.rs's folder of the same kind: the tests run at once.
-        let store = std::env::temp_dir().join(format!("thepuchnotch-agy-prune-{}", std::process::id()));
+        let store =
+            std::env::temp_dir().join(format!("thepuchnotch-agy-prune-{}", std::process::id()));
         let today = Local::now().date_naive();
         let touch = |path: &str, days_ago: u64| {
             let path = store.join(path);
@@ -415,7 +417,8 @@ mod tests {
     /// to sign in, not that agy stopped.
     #[tokio::test]
     async fn a_signed_out_agy_asks_to_sign_in() {
-        let root = std::env::temp_dir().join(format!("thepuchnotch-signed-out-{}", std::process::id()));
+        let root =
+            std::env::temp_dir().join(format!("thepuchnotch-signed-out-{}", std::process::id()));
         std::fs::create_dir_all(&root).unwrap();
         let fake = root.join("agy");
         std::fs::write(
@@ -448,7 +451,8 @@ mod tests {
 
     #[test]
     fn shares_the_users_sign_in() {
-        let root = std::env::temp_dir().join(format!("thepuchnotch-agy-login-{}", std::process::id()));
+        let root =
+            std::env::temp_dir().join(format!("thepuchnotch-agy-login-{}", std::process::id()));
         let (user, thepuchnotch) = (root.join("user"), root.join("thepuchnotch"));
         std::fs::create_dir_all(user.join(LOGIN).parent().unwrap()).unwrap();
         // Not signed in yet: nothing to link.
@@ -456,7 +460,10 @@ mod tests {
         assert!(!thepuchnotch.join(LOGIN).exists());
         std::fs::write(user.join(LOGIN), "token").unwrap();
         link_login(&user, &thepuchnotch);
-        assert_eq!(std::fs::read_to_string(thepuchnotch.join(LOGIN)).unwrap(), "token");
+        assert_eq!(
+            std::fs::read_to_string(thepuchnotch.join(LOGIN)).unwrap(),
+            "token"
+        );
         // agy replaced the link with a copy older than the user's: linked again.
         std::fs::remove_file(thepuchnotch.join(LOGIN)).unwrap();
         std::fs::write(thepuchnotch.join(LOGIN), "stale").unwrap();

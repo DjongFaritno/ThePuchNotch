@@ -541,7 +541,10 @@ fn read_claude() -> Result<Provider, ClaudeError> {
             .header("Authorization", &format!("Bearer {token}"))
             .header("anthropic-beta", "oauth-2025-04-20")
             // Said plainly who asks, never another app.
-            .header("User-Agent", concat!("thepuchnotch/", env!("CARGO_PKG_VERSION")))
+            .header(
+                "User-Agent",
+                concat!("thepuchnotch/", env!("CARGO_PKG_VERSION")),
+            )
             .call()
             .and_then(|mut reply| reply.body_mut().read_json())
             .map_err(|err| {
@@ -679,7 +682,10 @@ fn grok_billing() -> Result<Value, GrokError> {
         .header("X-XAI-Token-Auth", "xai-grok-cli")
         .header("x-userid", &sign_in.user_id)
         // Said plainly who asks, never another app.
-        .header("User-Agent", concat!("thepuchnotch/", env!("CARGO_PKG_VERSION")));
+        .header(
+            "User-Agent",
+            concat!("thepuchnotch/", env!("CARGO_PKG_VERSION")),
+        );
     if let Some(version) = crate::assistant::grok_client_version() {
         request = request.header("x-grok-client-version", &version);
     }
@@ -838,7 +844,10 @@ fn read_codex_live() -> Option<Provider> {
     let mut request = crate::http::get(CODEX_USAGE, CLAUDE_TIMEOUT)
         .header("Authorization", &format!("Bearer {token}"))
         // Said plainly who asks, never another app.
-        .header("User-Agent", concat!("thepuchnotch/", env!("CARGO_PKG_VERSION")));
+        .header(
+            "User-Agent",
+            concat!("thepuchnotch/", env!("CARGO_PKG_VERSION")),
+        );
     if let Some(account) = sign_in["tokens"]["account_id"].as_str() {
         request = request.header("ChatGPT-Account-Id", account);
     }
@@ -1269,7 +1278,8 @@ mod tests {
 
     #[test]
     fn reads_the_newest_limits_from_the_end_of_a_codex_log() {
-        let file = std::env::temp_dir().join(format!("thepuchnotch-codex-{}.jsonl", std::process::id()));
+        let file =
+            std::env::temp_dir().join(format!("thepuchnotch-codex-{}.jsonl", std::process::id()));
         let line = |percent: f64| {
             json!({"timestamp": "2026-10-21T08:00:00Z", "payload": {"rate_limits": {"plan_type": "plus",
                 "primary": {"used_percent": percent, "window_minutes": 300, "resets_at": 1793084579}}}})

@@ -5,8 +5,8 @@ use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
-use thepuchnotch_core::shelf::{CAPACITY, Shelf, ShelfItem};
 use log::warn;
+use thepuchnotch_core::shelf::{CAPACITY, Shelf, ShelfItem};
 use tokio::sync::oneshot::{self, error::TryRecvError};
 use tokio::sync::watch;
 use zbus::object_server::{InterfaceRef, SignalEmitter};

@@ -5,8 +5,8 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 
 use chrono::{DateTime, Duration, Local, NaiveDate, TimeZone, Utc};
-use thepuchnotch_core::calendar::{AddError, Calendar, Event, Parsed, Send, format_time, parse};
 use log::warn;
+use thepuchnotch_core::calendar::{AddError, Calendar, Event, Parsed, Send, format_time, parse};
 use tokio::sync::Notify;
 use zbus::object_server::{InterfaceRef, SignalEmitter};
 use zbus::{fdo, interface};
@@ -520,7 +520,14 @@ mod tests {
         let jakarta = FixedOffset::east_opt(7 * 3600).unwrap();
         let now = Utc.with_ymd_and_hms(2026, 10, 27, 2, 0, 0).unwrap();
         let day = NaiveDate::from_ymd_opt(2026, 10, 28).unwrap();
-        ical_event(day, &parse(text).unwrap(), &jakarta, now, "thepuchnotch-test").unwrap()
+        ical_event(
+            day,
+            &parse(text).unwrap(),
+            &jakarta,
+            now,
+            "thepuchnotch-test",
+        )
+        .unwrap()
     }
 
     fn target(uid: &str) -> eds::Target {

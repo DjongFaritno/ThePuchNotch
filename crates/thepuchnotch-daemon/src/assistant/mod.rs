@@ -33,10 +33,10 @@ use std::time::Duration;
 
 use chrono::NaiveDate;
 
-use thepuchnotch_core::voice::{Endpointer, Verdict, meter, rms};
 use log::{info, warn};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use thepuchnotch_core::voice::{Endpointer, Verdict, meter, rms};
 use tokio::sync::{mpsc, oneshot};
 use zbus::message::Header;
 use zbus::object_server::{InterfaceRef, SignalEmitter};
@@ -104,8 +104,7 @@ fn action_kinds() -> &'static [String] {
 }
 
 /// Said instead when the answer needed actions the running extension cannot do.
-const NEEDS_RELOGIN: &str =
-    "I can’t do that yet: thepuchnotch was updated, and the update starts once you log out and back in.";
+const NEEDS_RELOGIN: &str = "I can’t do that yet: thepuchnotch was updated, and the update starts once you log out and back in.";
 
 /// Where a request is, which picks what the island shows.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize)]
@@ -2246,11 +2245,9 @@ mod tests {
         session.context.apps = vec!["Firefox".into(), "Files".into()];
         let first = session.prompt("buka google", "Reminders: none");
         assert!(first.contains("open_url") && first.contains("Firefox, Files"));
-        assert!(
-            first.contains(
-                "What thepuchnotch knows now (the computer and the user's day):\nReminders: none\n"
-            )
-        );
+        assert!(first.contains(
+            "What thepuchnotch knows now (the computer and the user's day):\nReminders: none\n"
+        ));
         assert!(first.ends_with("The user said: \"buka google\""));
         session.conversation = Some("abc".into());
         session.sent_data = Some("Reminders: none".into());

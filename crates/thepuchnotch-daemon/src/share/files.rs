@@ -251,7 +251,8 @@ mod tests {
 
     #[test]
     fn a_long_cjk_name_lands_on_disk() {
-        let dir = std::env::temp_dir().join(format!("thepuchnotch-share-cjk-{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("thepuchnotch-share-cjk-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let temp = dir.join(".part");
         std::fs::write(&temp, b"x").unwrap();
@@ -272,7 +273,8 @@ mod tests {
         assert_eq!(numbered("image.jpg", 1), "image.jpg");
         assert_eq!(numbered("image.jpg", 2), "image 2.jpg");
         assert_eq!(numbered("README", 3), "README 3");
-        let dir = std::env::temp_dir().join(format!("thepuchnotch-share-names-{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("thepuchnotch-share-names-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("image.jpg"), b"old").unwrap();
         let temp = dir.join(".part");

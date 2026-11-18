@@ -549,7 +549,8 @@ impl Opencode {
         let turn = TURNS.fetch_add(1, Ordering::Relaxed);
         // Counted until the turn ends, so its conversations are never deleted under it (see `prune`).
         let _running = Running::new();
-        let config_path = thepuchnotch_home().join(format!("turn-{}-{turn}.json", std::process::id()));
+        let config_path =
+            thepuchnotch_home().join(format!("turn-{}-{turn}.json", std::process::id()));
         let config = serde_json::json!({"agent": {AGENT: {"prompt": self.prompt}}});
         crate::store::write_private(&config_path, config.to_string().as_bytes())
             .context("could not write opencode's prompt")?;
@@ -1728,7 +1729,8 @@ mod tests {
     #[test]
     fn hands_a_renewed_sign_in_back() {
         use std::os::unix::fs::PermissionsExt;
-        let dir = std::env::temp_dir().join(format!("thepuchnotch-opencode-auth-{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("thepuchnotch-opencode-auth-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let (thepuchnotch, user) = (dir.join("thepuchnotch.json"), dir.join("auth.json"));
         let oauth = |refresh: &str, expires: i64| json!({"type": "oauth", "refresh": refresh, "access": "a", "expires": expires});
@@ -2027,7 +2029,10 @@ mod tests {
 
     #[test]
     fn shares_opencode_2s_sign_ins_with_the_sandbox() {
-        let dir = std::env::temp_dir().join(format!("thepuchnotch-opencode-2-auth-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!(
+            "thepuchnotch-opencode-2-auth-{}",
+            std::process::id()
+        ));
         let _ = std::fs::remove_dir_all(&dir);
         let user = dir.join("user");
         let sandbox = dir.join("sandbox");
@@ -2090,8 +2095,10 @@ mod tests {
 
     #[test]
     fn puts_a_sign_in_back_when_the_hand_back_fails() {
-        let dir =
-            std::env::temp_dir().join(format!("thepuchnotch-opencode-2-auth-back-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!(
+            "thepuchnotch-opencode-2-auth-back-{}",
+            std::process::id()
+        ));
         let _ = std::fs::remove_dir_all(&dir);
         let user = dir.join("user");
         let sandbox = dir.join("sandbox");
@@ -2138,7 +2145,10 @@ mod tests {
         let program = super::super::brain::Provider::Opencode
             .program()
             .expect("opencode installed");
-        let dir = std::env::temp_dir().join(format!("thepuchnotch-opencode-probe-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!(
+            "thepuchnotch-opencode-probe-{}",
+            std::process::id()
+        ));
         std::fs::create_dir_all(&dir).unwrap();
         let target = dir.join("touched");
         let model = std::env::var("THEPUCHNOTCH_OPENCODE_PROBE_MODEL").unwrap_or_default();
@@ -2167,8 +2177,10 @@ mod tests {
     #[tokio::test]
     #[ignore = "asks the real opencode, with a stand-in server"]
     async fn a_well_known_sign_in_brings_no_tools_or_mcp_servers() {
-        let server = std::env::var("THEPUCHNOTCH_OPENCODE_PROBE_WELLKNOWN").expect("the stand-in server");
-        let marker = PathBuf::from(std::env::var("THEPUCHNOTCH_OPENCODE_PROBE_MARKER").expect("a marker"));
+        let server =
+            std::env::var("THEPUCHNOTCH_OPENCODE_PROBE_WELLKNOWN").expect("the stand-in server");
+        let marker =
+            PathBuf::from(std::env::var("THEPUCHNOTCH_OPENCODE_PROBE_MARKER").expect("a marker"));
         assert!(
             std::env::var_os("XDG_DATA_HOME").is_some(),
             "never the real sign-in"
@@ -2185,7 +2197,8 @@ mod tests {
         let program = super::super::brain::Provider::Opencode
             .program()
             .expect("opencode installed");
-        let dir = std::env::temp_dir().join(format!("thepuchnotch-opencode-wk-{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("thepuchnotch-opencode-wk-{}", std::process::id()));
         let target = dir.join("touched");
         let model = std::env::var("THEPUCHNOTCH_OPENCODE_PROBE_MODEL").unwrap_or_default();
         let mut opencode = Opencode::start(&program, &model, None, &dir.join("workspace"), "Test.")
@@ -2209,7 +2222,10 @@ mod tests {
 
     #[test]
     fn prunes_a_database_last_used_before_today() {
-        let home = std::env::temp_dir().join(format!("thepuchnotch-opencode-prune-{}", std::process::id()));
+        let home = std::env::temp_dir().join(format!(
+            "thepuchnotch-opencode-prune-{}",
+            std::process::id()
+        ));
         let data = home.join("data/opencode");
         std::fs::create_dir_all(data.join("log")).unwrap();
         let age = |path: &Path, days: u64| {

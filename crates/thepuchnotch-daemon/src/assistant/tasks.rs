@@ -707,7 +707,10 @@ mod tests {
 
     #[test]
     fn reads_how_it_ended() {
-        assert_eq!(exit_code("Setting up vlc ...\n\n[thepuchnotch-exit 0]\n"), Some(0));
+        assert_eq!(
+            exit_code("Setting up vlc ...\n\n[thepuchnotch-exit 0]\n"),
+            Some(0)
+        );
         assert_eq!(
             exit_code("E: Unable to locate package x\n\n[thepuchnotch-exit 100]\n"),
             Some(100)

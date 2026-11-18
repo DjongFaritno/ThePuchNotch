@@ -10,11 +10,11 @@ use std::path::{Path, PathBuf};
 use std::thread;
 use std::time::Duration;
 
-use thepuchnotch_core::lrc::{self, LyricLine};
-use thepuchnotch_core::track::{full_title, search_terms};
 use log::{debug, warn};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+use thepuchnotch_core::lrc::{self, LyricLine};
+use thepuchnotch_core::track::{full_title, search_terms};
 
 use super::art::fnv1a;
 use crate::store::cache_dir;

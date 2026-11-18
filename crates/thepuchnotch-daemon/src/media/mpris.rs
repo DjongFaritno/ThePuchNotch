@@ -2489,7 +2489,10 @@ mod bus_tests {
     async fn thepuchnotchd(bus: &Bus) -> (Connection, InterfaceRef<MediaService>) {
         let conn = bus.connect().await;
         let (service, wishes) = MediaService::new();
-        conn.object_server().at(THEPUCHNOTCHD_PATH, service).await.unwrap();
+        conn.object_server()
+            .at(THEPUCHNOTCHD_PATH, service)
+            .await
+            .unwrap();
         let iface = conn
             .object_server()
             .interface::<_, MediaService>(THEPUCHNOTCHD_PATH)

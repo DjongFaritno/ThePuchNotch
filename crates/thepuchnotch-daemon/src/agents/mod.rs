@@ -119,12 +119,21 @@ impl Ai {
     /// Puts thepuchnotch's hook in its config, pointing at this thepuchnotchd.
     fn hook(self) -> anyhow::Result<()> {
         let thepuchnotchd = thepuchnotchd_path()?;
-        let thepuchnotchd = thepuchnotchd
-            .to_str()
-            .with_context(|| format!("thepuchnotchd's path {} is not UTF-8", thepuchnotchd.display()))?;
+        let thepuchnotchd = thepuchnotchd.to_str().with_context(|| {
+            format!(
+                "thepuchnotchd's path {} is not UTF-8",
+                thepuchnotchd.display()
+            )
+        })?;
         match self {
-            Ai::Claude => claude::install(&self.config(), &claude::command(thepuchnotchd, "claude")),
-            Ai::Codex => codex::install(&self.config(), thepuchnotchd, &claude::command(thepuchnotchd, "codex")),
+            Ai::Claude => {
+                claude::install(&self.config(), &claude::command(thepuchnotchd, "claude"))
+            }
+            Ai::Codex => codex::install(
+                &self.config(),
+                thepuchnotchd,
+                &claude::command(thepuchnotchd, "codex"),
+            ),
         }
     }
 

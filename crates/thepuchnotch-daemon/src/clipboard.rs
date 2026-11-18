@@ -11,11 +11,11 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use image::{DynamicImage, ImageFormat};
+use log::{debug, warn};
+use serde::Serialize;
 use thepuchnotch_core::clipboard::{
     Added, Clip, ClipError, ClipboardHistory, MAX_PINNED, PinError, content_hash,
 };
-use log::{debug, warn};
-use serde::Serialize;
 use zbus::object_server::{InterfaceRef, SignalEmitter};
 use zbus::{fdo, interface};
 
@@ -655,7 +655,8 @@ mod tests {
 
     /// A fresh, empty directory for one test.
     fn scratch(name: &str) -> ClipFiles {
-        let dir = std::env::temp_dir().join(format!("thepuchnotch-clips-{}-{name}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("thepuchnotch-clips-{}-{name}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         ClipFiles { dir }
