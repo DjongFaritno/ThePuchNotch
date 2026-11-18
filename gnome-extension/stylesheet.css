@@ -1,0 +1,1672 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 zickrian */
+
+/* thepuchnotch. island.js draws the island black; this styles what sits on it (see docs/product-spec.md).
+ * A dark palette: surfaces #1c1c1e #2c2c2e #3a3a3c; accents #30d158 #ff453a #0a84ff #ff9f0a #5e5ce6. */
+
+/* ── Shared ───────────────────────────────────────────── */
+
+/* Inter, installed with thepuchnotch. St takes a single quoted family only: a list stops it reading the
+ * rules that follow. */
+#thepuchnotchIsland {
+  color: #ffffff;
+  font-family: "Inter Variable";
+}
+
+/* Tabular figures for numbers that change or line up, so they hold still; prose keeps proportional
+ * ones ("11:10" and "thepuchnotch-0.9.1" would space out). */
+.thepuchnotch-compact-clock, .thepuchnotch-compact-date, .thepuchnotch-compact-second-time, .thepuchnotch-header-time, .thepuchnotch-recording-time,
+.thepuchnotch-timer-time, .thepuchnotch-stepper-value, .thepuchnotch-time, .thepuchnotch-volume-text, .thepuchnotch-peek-value,
+.thepuchnotch-call-duration, .thepuchnotch-reminders-count, .thepuchnotch-cal-event-time, .thepuchnotch-cal-day, .thepuchnotch-usage-percent {
+  font-feature-settings: "tnum";
+}
+
+.thepuchnotch-button {
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 6px;
+  transition-duration: 120ms;
+}
+
+.thepuchnotch-button:hover { background-color: rgba(255, 255, 255, 0.12); }
+.thepuchnotch-button:active { background-color: rgba(255, 255, 255, 0.2); }
+.thepuchnotch-button:focus { color: #ffffff; }
+
+.thepuchnotch-button-flat { background-color: transparent; }
+
+.thepuchnotch-button-round { background-color: #2c2c2e; padding: 8px; }
+.thepuchnotch-button-round:hover { background-color: #3a3a3c; }
+.thepuchnotch-button-small { padding: 6px; }
+
+/* Pill button with text (alert actions). */
+.thepuchnotch-pill {
+  font-weight: 600;
+  border-radius: 999px;
+  transition-duration: 120ms;
+}
+
+/* Buttons: grey (solid, so an alert's glow never tints it), white text, lighter under the pointer.
+ * 25 px tall wherever they are: an alert's, a card's, Clear. */
+.thepuchnotch-pill-small {
+  font-size: 12px;
+  padding: 5px 14px;
+  color: #ffffff;
+  background-color: #2c2c2e;
+}
+
+.thepuchnotch-pill-small:hover { background-color: #3a3a3c; }
+.thepuchnotch-pill-small:active { background-color: #48484a; }
+
+/* An alert's one thing to do now (Join), in the accent colour. */
+.thepuchnotch-pill-accent { background-color: #0a84ff; }
+.thepuchnotch-pill-accent:hover { background-color: #2b95ff; }
+.thepuchnotch-pill-accent:active { background-color: #0071e3; }
+
+.thepuchnotch-art { background-color: #2c2c2e; }
+.thepuchnotch-art-placeholder { color: rgba(255, 255, 255, 0.4); }
+
+.thepuchnotch-level {
+  height: 5px;
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.thepuchnotch-level-fill { border-radius: 3px; background-color: #ffffff; }
+
+.thepuchnotch-bars { spacing: 2px; }
+.thepuchnotch-bar { width: 3px; border-radius: 2px; background-color: #ffffff; }
+
+.thepuchnotch-empty { spacing: 4px; }
+.thepuchnotch-empty-icon { color: rgba(255, 255, 255, 0.35); padding-bottom: 4px; }
+.thepuchnotch-empty-title { font-size: 15px; font-weight: 600; letter-spacing: -0.1px; }
+.thepuchnotch-empty-hint { font-size: 12px; color: rgba(255, 255, 255, 0.5); }
+
+.thepuchnotch-entry {
+  color: #ffffff;
+  font-size: 13px;
+  border-radius: 999px;
+  padding: 8px 14px;
+  border: none;
+  background-color: #1c1c1e;
+  caret-color: #0a84ff;
+  selection-background-color: rgba(10, 132, 255, 0.5);
+  selected-color: #ffffff;
+}
+
+.thepuchnotch-entry:focus { background-color: #2c2c2e; }
+.thepuchnotch-entry StLabel.hint-text { color: rgba(255, 255, 255, 0.45); }
+
+/* Blur my Shell restyles every entry in the shell from an ancestor, with
+ * !important (light entries on a black island); the island's keep theirs. */
+#thepuchnotchIsland .thepuchnotch-entry { color: #ffffff !important; background-color: #1c1c1e !important; }
+#thepuchnotchIsland .thepuchnotch-entry:focus {
+  background-color: #2c2c2e !important;
+  box-shadow: none !important;
+}
+#thepuchnotchIsland .thepuchnotch-entry StLabel.hint-text { color: rgba(255, 255, 255, 0.45) !important; }
+
+/* ── Top bar ──────────────────────────────────────────── */
+
+/* Compact top bar: slimmer than GNOME's 2.2em, so it reads as a thin bezel
+ * around the island. Status icons and the tray stay where they are. */
+#panel.thepuchnotch-compact-bar {
+  height: 26px;
+  font-size: 13px;
+  font-family: "Inter Variable";
+  font-weight: 500;
+}
+
+/* Closed island inside the top bar, like a notch: maximised windows start below the bar, the island as tall
+ * or, with space below it (Settings), a little shorter. Comes after the compact bar's height so it wins. */
+#panel.thepuchnotch-notch-bar { height: 32px; }
+/* A pill inside the bar: 30 px tall, 3 px of bar above and below it, as a notched display's menu bar holds its notch. */
+#panel.thepuchnotch-notch-bar.thepuchnotch-pill-bar { height: 36px; }
+
+/* thepuchnotch's bar is black or see-through in light and dark style alike: its text and icons stay white,
+ * as GNOME's light style has them over the overview (it makes them near-black otherwise). */
+#panel.thepuchnotch-panel .panel-button { color: #ffffff; }
+#panel.thepuchnotch-panel .panel-button:focus, #panel.thepuchnotch-panel .panel-button:hover { box-shadow: inset 0 0 0 100px rgba(255, 255, 255, 0.17); }
+#panel.thepuchnotch-panel .panel-button:active, #panel.thepuchnotch-panel .panel-button:checked { box-shadow: inset 0 0 0 100px rgba(255, 255, 255, 0.28); }
+#panel.thepuchnotch-panel .panel-button:active:hover, #panel.thepuchnotch-panel .panel-button:checked:hover { box-shadow: inset 0 0 0 100px rgba(255, 255, 255, 0.32); }
+#panel.thepuchnotch-panel .panel-button#panelActivities .workspace-dot { background-color: #ffffff; }
+/* Screen recording and sharing keep GNOME's own red and orange (its dark style's, as the bar is). */
+#panel.thepuchnotch-panel .panel-button.screen-recording-indicator:focus,
+#panel.thepuchnotch-panel .panel-button.screen-recording-indicator:hover { box-shadow: inset 0 0 0 100px #d61f2d; }
+#panel.thepuchnotch-panel .panel-button.screen-recording-indicator:active,
+#panel.thepuchnotch-panel .panel-button.screen-recording-indicator:checked { box-shadow: inset 0 0 0 100px #e02a37; }
+#panel.thepuchnotch-panel .panel-button.screen-recording-indicator:active:hover,
+#panel.thepuchnotch-panel .panel-button.screen-recording-indicator:checked:hover { box-shadow: inset 0 0 0 100px #e13340; }
+#panel.thepuchnotch-panel .panel-button.screen-sharing-indicator:focus,
+#panel.thepuchnotch-panel .panel-button.screen-sharing-indicator:hover { box-shadow: inset 0 0 0 100px #ff861a; }
+#panel.thepuchnotch-panel .panel-button.screen-sharing-indicator:active,
+#panel.thepuchnotch-panel .panel-button.screen-sharing-indicator:checked { box-shadow: inset 0 0 0 100px #ff902e; }
+#panel.thepuchnotch-panel .panel-button.screen-sharing-indicator:active:hover,
+#panel.thepuchnotch-panel .panel-button.screen-sharing-indicator:checked:hover { box-shadow: inset 0 0 0 100px #ff9638; }
+
+/* The glass bar has no colour, so its text and icons carry a soft shadow to
+ * stay readable on a light wallpaper. */
+#panel.thepuchnotch-glass-bar .panel-button {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+  icon-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+/* Medium weight, calmer than the theme's bold. */
+#panel.thepuchnotch-compact-bar .panel-button {
+  font-weight: 500;
+  border-width: 2px;
+  -natural-hpadding: 10px;
+  -minimum-hpadding: 5px;
+}
+
+/* ── Compact ──────────────────────────────────────────── */
+
+/* Each side's padding toward the clock is its gap to it; compact.js makes both sides as wide, and sets
+ * the room at the ends from the island's height. */
+.thepuchnotch-compact-start { padding-right: 30px; }
+.thepuchnotch-compact-end { padding-left: 30px; }
+
+.thepuchnotch-compact-clock { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; }
+.thepuchnotch-compact-clock-box { spacing: 6px; }
+/* AM or PM after the time with a 12-hour clock: 80% of its size, a little dimmer, a space's width from it. */
+.thepuchnotch-compact-clock-row { spacing: 4px; }
+.thepuchnotch-compact-meridiem { font-size: 13.6px; font-weight: 600; color: rgba(255, 255, 255, 0.72); }
+/* The day before the time (Settings): as large, quieter, a little further from it than AM or PM. */
+.thepuchnotch-compact-date { font-size: 17px; font-weight: 500; letter-spacing: -0.2px; margin-right: 2px; color: rgba(255, 255, 255, 0.7); }
+
+/* Inside the top bar everything is sized like the bar's own text. */
+.thepuchnotch-compact-in-bar .thepuchnotch-compact-start { padding-right: 28px; }
+.thepuchnotch-compact-in-bar .thepuchnotch-compact-end { padding-left: 28px; }
+.thepuchnotch-compact-in-bar .thepuchnotch-compact-clock { font-size: 15px; letter-spacing: -0.1px; }
+.thepuchnotch-compact-in-bar .thepuchnotch-compact-clock-row { spacing: 3px; }
+.thepuchnotch-compact-in-bar .thepuchnotch-compact-meridiem { font-size: 12px; }
+.thepuchnotch-compact-in-bar .thepuchnotch-compact-date { font-size: 15px; letter-spacing: -0.1px; }
+
+.thepuchnotch-unseen-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: #ffffff;
+}
+
+/* Live activities: privacy dots and screen recording */
+
+.thepuchnotch-privacy-dots { spacing: 4px; padding-left: 4px; }
+/* On the closed island, a tight cluster after the right side's sign. */
+.thepuchnotch-compact-trail .thepuchnotch-privacy-dots { padding-left: 0; }
+
+.thepuchnotch-privacy-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 4px;
+}
+
+.thepuchnotch-privacy-dot.camera { background-color: #34c759; }
+.thepuchnotch-privacy-dot.microphone { background-color: #ff9f0a; }
+.thepuchnotch-privacy-dot.screenShare { background-color: #0a84ff; }
+/* Sharing the Shelf with a phone: violet, the bot's glow; no other dot is. */
+.thepuchnotch-privacy-dot.phone { background-color: #bf5af2; }
+
+.thepuchnotch-recording-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #ff453a;
+}
+
+/* A call, in green; a red microphone while muted. */
+.thepuchnotch-call-icon { color: #30d158; }
+.thepuchnotch-call-muted { color: #ff453a; }
+/* The closed island's right side: its sign, then the privacy dots. */
+.thepuchnotch-compact-trail { spacing: 6px; }
+/* As large as the clock and on its line: the two times read as one row. */
+.thepuchnotch-compact-second-time { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; }
+.thepuchnotch-compact-in-bar .thepuchnotch-compact-second-time { font-size: 15px; letter-spacing: -0.1px; }
+
+/* ── Alerts (peek) ────────────────────────────────────── */
+
+/* As much room at the sides as above and below the badge (PADDING in peek.js). */
+.thepuchnotch-peek-row { padding: 0 12px; spacing: 10px; }
+/* At the top, as its texts and the assistant beside them are (peek.js); the room below is in its height. */
+.thepuchnotch-peek-row-asks { padding: 12px 12px 0 12px; spacing: 12px; }
+/* Lit along its edges: more room, so the buttons stay clear of the light (GLOW_PADDING in peek.js). */
+.thepuchnotch-peek-row-glow { padding: 16px 16px 0 16px; }
+
+/* The badge's colour comes from the alert (peek.js); a hairline on top
+ * gives it depth. */
+.thepuchnotch-peek-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Inside a level ring: a smaller badge, lit like the others (peek.js). */
+.thepuchnotch-peek-ring-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 11px;
+}
+
+/* A short state on the right, e.g. Caps Lock "On", in the alert's colour. */
+.thepuchnotch-peek-status {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.thepuchnotch-peek-title { font-size: 14px; font-weight: 600; }
+.thepuchnotch-peek-subtitle { font-size: 12px; color: rgba(255, 255, 255, 0.5); }
+.thepuchnotch-peek-code {
+    font-family: monospace;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 6px;
+    padding: 5px 9px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+/* Its buttons; the space between them is ACTIONS_SPACING in peek.js. */
+.thepuchnotch-peek-actions { padding-top: 10px; }
+/* The × on an alert's icon under the pointer (widgets.js `cornerClose`). */
+.thepuchnotch-corner-close {
+  padding: 0;
+  width: 18px;
+  height: 18px;
+  color: rgba(255, 255, 255, 0.85);
+  background-color: #3a3a3c;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.thepuchnotch-corner-close:hover { color: #ffffff; background-color: #4a4a4e; }
+.thepuchnotch-corner-close:active { background-color: #5a5a5e; }
+.thepuchnotch-peek-answered { spacing: 6px; padding-top: 9px; }
+.thepuchnotch-peek-answered-text { font-size: 12px; font-weight: 600; }
+.thepuchnotch-peek-allowed { color: #30d158; }
+.thepuchnotch-peek-denied { color: #ff453a; }
+.thepuchnotch-peek-value { font-size: 20px; font-weight: 600; letter-spacing: -0.5px; }
+.thepuchnotch-peek-level-box { spacing: 8px; }
+.thepuchnotch-peek-level-text { font-size: 12px; font-weight: 600; min-width: 30px; text-align: right; }
+
+/* ── Voice assistant ──────────────────────────────────── */
+
+/* The orb on the left, then what was heard above the answer (voice.js sizes them to match). */
+.thepuchnotch-voice-row { padding: 14px 16px 20px 16px; spacing: 12px; }
+.thepuchnotch-voice-orb { border-radius: 999px; }
+.thepuchnotch-voice-heard { font-size: 12px; color: rgba(255, 255, 255, 0.5); padding-bottom: 2px; }
+.thepuchnotch-voice-text { font-size: 15px; font-weight: 500; letter-spacing: -0.1px; }
+.thepuchnotch-voice-text-dim { color: rgba(255, 255, 255, 0.6); }
+.thepuchnotch-voice-text-long { font-size: 14px; font-weight: 400; color: rgba(255, 255, 255, 0.92); }
+.thepuchnotch-voice-hint { font-size: 12px; color: rgba(255, 255, 255, 0.5); padding-top: 4px; }
+.thepuchnotch-voice-steps { spacing: 3px; padding-top: 5px; }
+.thepuchnotch-voice-step { spacing: 6px; }
+.thepuchnotch-voice-step-tick { color: rgba(255, 255, 255, 0.45); }
+.thepuchnotch-voice-step-text { font-size: 12px; color: rgba(255, 255, 255, 0.5); }
+.thepuchnotch-voice-sign-in { margin-top: 10px; }
+.thepuchnotch-voice-heard-row { spacing: 4px; }
+.thepuchnotch-voice-heard-button { padding: 0; border-radius: 6px; }
+.thepuchnotch-voice-heard-button:hover .thepuchnotch-voice-heard { color: rgba(255, 255, 255, 0.75); }
+.thepuchnotch-voice-earlier { color: rgba(255, 255, 255, 0.5); }
+.thepuchnotch-voice-still { font-size: 12px; color: rgba(255, 255, 255, 0.46); padding-top: 4px; }
+.thepuchnotch-voice-undo { spacing: 8px; padding-bottom: 6px; }
+.thepuchnotch-voice-ideas { spacing: 6px; padding-top: 8px; }
+.thepuchnotch-voice-idea {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 11px;
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.09);
+    border: 1px solid transparent;
+}
+.thepuchnotch-voice-idea:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.13); }
+.thepuchnotch-voice-undo-text { font-size: 12px; color: rgba(255, 255, 255, 0.6); }
+.thepuchnotch-voice-undo-button { font-size: 12px; padding: 3px 10px; }
+
+/* The command card, set straight on the pill (no box of its own): what it is for, the command coloured as a
+   shell would, then what to know on the left and Deny or Run on the right. */
+.thepuchnotch-card { margin-top: 8px; spacing: 8px; }
+.thepuchnotch-card-ended { spacing: 5px; }
+.thepuchnotch-card-head { spacing: 8px; }
+.thepuchnotch-card-title { font-size: 13px; font-weight: 600; }
+.thepuchnotch-card-subtitle { font-size: 12px; color: rgba(255, 255, 255, 0.5); font-feature-settings: "tnum"; }
+.thepuchnotch-card-terminal { padding: 8px 11px; spacing: 4px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.07); }
+.thepuchnotch-card-ended .thepuchnotch-card-terminal { padding: 5px 10px; background-color: rgba(255, 255, 255, 0.05); }
+.thepuchnotch-card-line { spacing: 10px; }
+.thepuchnotch-copy-button { padding: 0; border-radius: 4px; }
+.thepuchnotch-copy-button:hover .thepuchnotch-card-command, .thepuchnotch-copy-button:hover .thepuchnotch-chat-command-text { color: #ffffff; }
+.thepuchnotch-card-command { font-family: monospace; font-size: 12px; }
+.thepuchnotch-card-output { font-family: monospace; font-size: 11px; color: rgba(255, 255, 255, 0.46); }
+.thepuchnotch-card-output-failed { color: #ff6961; }
+.thepuchnotch-card-sweep { margin-top: 2px; }
+.thepuchnotch-card-foot { spacing: 8px; }
+.thepuchnotch-card-risks { spacing: 6px; }
+.thepuchnotch-card-risk { spacing: 6px; color: #ffb340; }
+.thepuchnotch-card-risk-removes { color: #ff6961; }
+.thepuchnotch-card-risk-text { font-size: 12px; font-weight: 500; }
+.thepuchnotch-card-button { padding: 5px 8px 5px 14px; }
+.thepuchnotch-card-button-plain { padding: 5px 14px; }
+.thepuchnotch-card-button-box { spacing: 8px; }
+.thepuchnotch-card-button-label { font-size: 12px; font-weight: 600; }
+.thepuchnotch-card-key { font-size: 11px; font-weight: 500; padding: 0 1px; }
+.thepuchnotch-card-ghost { color: #ffffff; }
+.thepuchnotch-card-ghost .thepuchnotch-card-key { color: rgba(255, 255, 255, 0.46); }
+.thepuchnotch-card-run, .thepuchnotch-pill-white { color: #000000; background-color: #ffffff; }
+.thepuchnotch-card-run:hover, .thepuchnotch-pill-white:hover { background-color: rgba(255, 255, 255, 0.86); }
+.thepuchnotch-card-run:active, .thepuchnotch-pill-white:active { background-color: rgba(255, 255, 255, 0.72); }
+.thepuchnotch-card-run .thepuchnotch-card-key { color: rgba(0, 0, 0, 0.45); }
+.thepuchnotch-card-status { spacing: 5px; }
+.thepuchnotch-card-status-text { font-size: 11px; font-weight: 600; font-feature-settings: "tnum"; }
+.thepuchnotch-card-done { color: #30d158; }
+.thepuchnotch-card-failed { color: #ff453a; }
+.thepuchnotch-card-denied { color: rgba(255, 255, 255, 0.5); }
+
+/* The conversation, above the pill. */
+.thepuchnotch-chat { padding: 10px 16px 0 16px; spacing: 8px; }
+.thepuchnotch-chat-header { spacing: 6px; }
+.thepuchnotch-chat-title { font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, 0.46); }
+.thepuchnotch-chat-copied, .thepuchnotch-card-copied { color: #30d158; }
+.thepuchnotch-chat-new { padding: 5px; color: rgba(255, 255, 255, 0.75); background-color: rgba(255, 255, 255, 0.08); }
+.thepuchnotch-chat-new:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.16); }
+.thepuchnotch-chat-list { spacing: 10px; padding-top: 6px; padding-bottom: 4px; }
+.thepuchnotch-chat-scroll { -st-vfade-offset: 28px; }
+.thepuchnotch-chat-user { padding: 6px 12px; spacing: 5px; border-radius: 15px; background-color: rgba(255, 255, 255, 0.12); }
+.thepuchnotch-chat-user-text { font-size: 13px; }
+.thepuchnotch-chat-reply { font-size: 13px; color: rgba(255, 255, 255, 0.9); }
+.thepuchnotch-chat-reply-row { spacing: 8px; }
+.thepuchnotch-chat-time { font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, 0.46); font-feature-settings: "tnum"; }
+.thepuchnotch-chat-command { spacing: 8px; }
+.thepuchnotch-chat-command-text { font-family: monospace; font-size: 11px; padding: 5px 9px; border-radius: 8px; background-color: rgba(255, 255, 255, 0.06); }
+/* As wide whatever it says, so the command beside it keeps its width. */
+.thepuchnotch-chat-command-status { min-width: 56px; }
+.thepuchnotch-chat-command-status .thepuchnotch-card-status-text { font-size: 11px; }
+
+/* The round button at the row's end: 32 px with any of its icons (see ACTION_SIZE in voice.js). */
+.thepuchnotch-voice-action { padding: 8px; color: rgba(255, 255, 255, 0.7); background-color: rgba(255, 255, 255, 0.08); }
+.thepuchnotch-voice-action:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.15); }
+.thepuchnotch-voice-action:active { background-color: rgba(255, 255, 255, 0.22); }
+.thepuchnotch-voice-stop { padding: 10px; color: #ffffff; background-color: rgba(255, 255, 255, 0.14); }
+.thepuchnotch-voice-send { padding: 7px; border-radius: 999px; color: #000000; background-color: #ffffff; transition-duration: 150ms; }
+.thepuchnotch-voice-send-mic { color: #ffffff; background-color: rgba(255, 255, 255, 0.14); }
+.thepuchnotch-voice-send-mic:hover { background-color: rgba(255, 255, 255, 0.24); }
+
+/* The typed request: a quiet field, no accent ring (GNOME's and Blur my Shell's, with !important). */
+#thepuchnotchIsland .thepuchnotch-voice-entry,
+#thepuchnotchIsland .thepuchnotch-voice-entry:hover,
+#thepuchnotchIsland .thepuchnotch-voice-entry:focus,
+#thepuchnotchIsland .thepuchnotch-voice-entry:focus:hover {
+  font-size: 14px;
+  font-weight: 500;
+  min-height: 0;
+  padding: 4px 4px 4px 16px;
+  border-radius: 999px;
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.09) !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+  caret-color: #ffffff;
+  selection-background-color: rgba(255, 255, 255, 0.28);
+  selected-color: #ffffff;
+}
+#thepuchnotchIsland .thepuchnotch-voice-entry:focus,
+#thepuchnotchIsland .thepuchnotch-voice-entry:focus:hover { border: 1px solid rgba(255, 255, 255, 0.16) !important; }
+#thepuchnotchIsland .thepuchnotch-voice-entry StLabel.hint-text { color: rgba(255, 255, 255, 0.45) !important; }
+.thepuchnotch-compact-warning { color: #ff453a; }
+.thepuchnotch-header-mic { padding: 4px; color: rgba(255, 255, 255, 0.6); }
+.thepuchnotch-header-mic:hover { color: #ffffff; }
+
+/* ── Expanded: frame ──────────────────────────────────── */
+
+/* What shows lines up with the pages' 20px edges: the open tab's pill on the left, the settings icon on the right. */
+.thepuchnotch-header { padding: 0 16px 0 20px; }
+.thepuchnotch-header-clock { spacing: 8px; }
+
+/* Tabs to the pages: icons, with the open page's name in a lit pill. */
+.thepuchnotch-tabs { spacing: 2px; }
+
+.thepuchnotch-tab {
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: #ffffff;
+  transition-duration: 150ms;
+}
+
+/* The open tab sits on a dark grey pill; no outlines. */
+.thepuchnotch-tab:hover,
+.thepuchnotch-tab:focus { background-color: rgba(255, 255, 255, 0.05); color: #ffffff; }
+.thepuchnotch-tab:checked { background-color: rgba(255, 255, 255, 0.09); }
+.thepuchnotch-tab-box { spacing: 0; min-height: 18px; }
+/* The gap from the icon is the name's own margin, so a closed name takes no room (expanded.js). Its 17 px
+ * line plus 1: every tab an even 26 px, centred to the pixel in the bar, the name on the clock's line. */
+.thepuchnotch-tab-label { font-size: 13px; font-weight: 600; margin-left: 6px; padding-bottom: 1px; }
+
+/* A dot on a tab whose page has news. */
+.thepuchnotch-tab-badge {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: #ff453a;
+}
+.thepuchnotch-header-date { font-size: 13px; color: rgba(255, 255, 255, 0.9); }
+.thepuchnotch-header-time { font-size: 13px; font-weight: 600; }
+.thepuchnotch-header-time-box { spacing: 3px; }
+.thepuchnotch-header-meridiem { font-size: 10.4px; font-weight: 600; color: rgba(255, 255, 255, 0.72); }
+.thepuchnotch-header-settings { padding: 4px; color: rgba(255, 255, 255, 0.6); }
+.thepuchnotch-header-settings:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.1); }
+.thepuchnotch-header-status { spacing: 10px; }
+
+.thepuchnotch-recording-pill {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background-color: rgba(255, 69, 58, 0.18);
+}
+
+.thepuchnotch-recording-pill:hover { background-color: rgba(255, 69, 58, 0.32); }
+.thepuchnotch-recording-pill-box { spacing: 6px; }
+.thepuchnotch-recording-time { font-size: 12px; font-weight: 700; color: #ff6961; }
+
+/* Pages line up with the header's edges, as far in as the room below them (BOTTOM_PADDING in expanded.js). */
+.thepuchnotch-page { padding: 6px 20px 0 20px; }
+
+/* ── Music ────────────────────────────────────────────── */
+
+.thepuchnotch-player { spacing: 20px; }
+.thepuchnotch-player-column { spacing: 4px; }
+.thepuchnotch-player-head { spacing: 8px; }
+.thepuchnotch-player-modes { spacing: 2px; }
+.thepuchnotch-player-modes .thepuchnotch-button { padding: 5px; color: rgba(255, 255, 255, 0.75); }
+.thepuchnotch-player-top { spacing: 14px; }
+.thepuchnotch-player-texts { spacing: 1px; }
+.thepuchnotch-track-title { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; }
+.thepuchnotch-track-subtitle { font-size: 13px; color: rgba(255, 255, 255, 0.55); }
+/* The playing app's icon on the cover's corner, ringed in black. */
+.thepuchnotch-app-badge {
+  padding: 2px;
+  border-radius: 999px;
+  background-color: #000000;
+}
+
+.thepuchnotch-player-progress { spacing: 10px; padding-top: 6px; }
+
+.thepuchnotch-time {
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 34px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.thepuchnotch-time-end { text-align: right; }
+
+.thepuchnotch-slider { height: 16px; }
+.thepuchnotch-slider-track { border-radius: 2px; background-color: rgba(255, 255, 255, 0.2); }
+.thepuchnotch-slider-fill { border-radius: 2px; background-color: #ffffff; }
+.thepuchnotch-slider-knob { border-radius: 6px; background-color: #ffffff; }
+
+.thepuchnotch-transport { spacing: 20px; }
+.thepuchnotch-play { padding: 6px; }
+.thepuchnotch-mode-toggle.on { background-color: rgba(255, 255, 255, 0.16); }
+
+/* Volume and outputs */
+
+.thepuchnotch-audio-layout { spacing: 8px; padding-top: 2px; }
+/* Its speaker over the outputs' icons, the slider from where their names start (.thepuchnotch-output-button). */
+.thepuchnotch-volume-row { spacing: 6px; padding-left: 6px; }
+.thepuchnotch-volume-text { font-size: 12px; font-weight: 600; min-width: 46px; text-align: right; color: rgba(255, 255, 255, 0.85); }
+.thepuchnotch-output-list { spacing: 4px; }
+
+.thepuchnotch-output-button {
+  border-radius: 12px;
+  padding: 6px 12px;
+  color: #ffffff;
+  transition-duration: 120ms;
+}
+
+.thepuchnotch-output-button:hover { background-color: #1c1c1e; }
+.thepuchnotch-output-button.active { background-color: #1c1c1e; }
+.thepuchnotch-output-row { spacing: 12px; }
+.thepuchnotch-output-name { font-size: 13px; font-weight: 600; }
+.thepuchnotch-output-detail { font-size: 12px; color: rgba(255, 255, 255, 0.5); }
+
+/* Lyrics: the player in a column beside the words. */
+
+.thepuchnotch-lyrics-layout { spacing: 26px; }
+.thepuchnotch-lyrics-side { width: 232px; spacing: 8px; }
+.thepuchnotch-lyrics-side .thepuchnotch-player-top { spacing: 12px; }
+.thepuchnotch-lyrics-side .thepuchnotch-player-progress { padding-top: 2px; }
+.thepuchnotch-lyrics-controls { spacing: 4px; }
+.thepuchnotch-lyrics-controls .thepuchnotch-transport { spacing: 14px; }
+.thepuchnotch-lyrics-controls .thepuchnotch-mode-toggle { color: rgba(255, 255, 255, 0.75); }
+.thepuchnotch-side-title { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+.thepuchnotch-side-artist { font-size: 12px; color: rgba(255, 255, 255, 0.6); }
+.thepuchnotch-side-bars { padding-top: 5px; }
+
+/* Lines fade at the edges as they scroll; room below lets the last ones
+ * reach the reading line. */
+.thepuchnotch-lyrics-scroll { -st-vfade-offset: 26px; }
+.thepuchnotch-lyrics-column, .thepuchnotch-lyrics-block { spacing: 2px; }
+.thepuchnotch-lyrics-end { height: 72px; }
+
+/* Size, brightness and scale per line are set in lyrics.js. */
+.thepuchnotch-lyric-line {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  padding: 3px 0;
+  color: #ffffff;
+}
+
+.thepuchnotch-lyric-line.plain {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* A pause in the singing. */
+.thepuchnotch-lyric-dots { spacing: 6px; padding: 9px 2px; }
+.thepuchnotch-lyric-dot { width: 7px; height: 7px; border-radius: 4px; background-color: #ffffff; }
+
+/* No lines: loading, not found, instrumental, or the service unreachable. */
+.thepuchnotch-lyrics-state { spacing: 3px; }
+.thepuchnotch-lyrics-state-icon { color: rgba(255, 255, 255, 0.4); padding-bottom: 5px; }
+.thepuchnotch-lyrics-state-dots { padding: 4px 0 8px 0; }
+.thepuchnotch-lyrics-state-dots .thepuchnotch-lyric-dot { background-color: rgba(255, 255, 255, 0.6); }
+.thepuchnotch-lyrics-state-title { font-size: 14px; font-weight: 600; color: rgba(255, 255, 255, 0.85); }
+.thepuchnotch-lyrics-state-hint { font-size: 12px; color: rgba(255, 255, 255, 0.55); }
+
+/* ── Call ─────────────────────────────────────────────── */
+
+/* The call's window; call.js rounds its corners and draws a hairline edge. */
+.thepuchnotch-call-preview { background-color: #1c1c1e; border-radius: 14px; }
+.thepuchnotch-call-preview-button { border-radius: 14px; }
+.thepuchnotch-call-preview-button:focus { color: #ffffff; }
+.thepuchnotch-call-placeholder { spacing: 8px; }
+.thepuchnotch-call-hint { font-size: 11px; font-weight: 500; color: rgba(255, 255, 255, 0.5); }
+
+/* Over the preview under the pointer: where a click goes. */
+.thepuchnotch-call-preview-hover {
+  padding: 9px;
+  border-radius: 999px;
+  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.55);
+}
+
+.thepuchnotch-call-side { spacing: 2px; }
+.thepuchnotch-call-head { spacing: 8px; }
+.thepuchnotch-call-name { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; }
+.thepuchnotch-call-status { spacing: 5px; padding-left: 1px; }
+.thepuchnotch-call-kind { font-size: 13px; color: rgba(255, 255, 255, 0.55); }
+.thepuchnotch-call-duration { font-size: 13px; font-weight: 600; color: #30d158; }
+
+/* Round buttons with captions; mute turns white while on. */
+.thepuchnotch-call-controls { spacing: 18px; padding-top: 14px; }
+.thepuchnotch-call-control-box { spacing: 5px; }
+
+.thepuchnotch-call-control {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  color: #ffffff;
+  background-color: #2c2c2e;
+  transition-duration: 120ms;
+}
+
+.thepuchnotch-call-control:hover { background-color: #3a3a3c; }
+.thepuchnotch-call-control:focus { color: #ffffff; }
+.thepuchnotch-call-control:checked { color: #000000; background-color: #ffffff; }
+.thepuchnotch-call-control:checked:hover { background-color: #e6e6e6; }
+.thepuchnotch-call-control-label { font-size: 11px; font-weight: 500; color: rgba(255, 255, 255, 0.6); }
+
+/* The Call tab's phone is green, like the call itself. */
+.thepuchnotch-tab-call StIcon { color: #30d158; }
+
+/* ── Focus ────────────────────────────────────────────── */
+
+/* The Focus page (timer.js): a ring with the time and the phase, steppers for the lengths, and Start. */
+.thepuchnotch-timer-time { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; }
+.thepuchnotch-timer-phase { font-size: 12px; font-weight: 500; color: rgba(255, 255, 255, 0.55); }
+
+/* "Work  25  −  +", as a pill. */
+.thepuchnotch-steppers { spacing: 8px; }
+.thepuchnotch-stepper { padding: 3px 4px 3px 12px; spacing: 4px; border-radius: 999px; background-color: #1c1c1e; }
+.thepuchnotch-stepper-name { font-size: 12px; font-weight: 500; color: rgba(255, 255, 255, 0.55); width: 40px; }
+.thepuchnotch-stepper-value { font-size: 15px; font-weight: 600; letter-spacing: -0.1px; width: 26px; text-align: right; padding-right: 6px; }
+/* The length is a field as well: quiet until the pointer is on it or it is being typed in. */
+#thepuchnotchIsland .thepuchnotch-stepper-entry,
+#thepuchnotchIsland .thepuchnotch-stepper-entry:hover,
+#thepuchnotchIsland .thepuchnotch-stepper-entry:focus,
+#thepuchnotchIsland .thepuchnotch-stepper-entry:focus:hover {
+  /* Room for three digits ("180"), in step with the text's size: a field scrolls what it can't fit. */
+  width: 2.4em;
+  min-height: 0;
+  padding: 0 6px 0 0;
+  border: none !important;
+  border-radius: 6px;
+  color: #ffffff !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  caret-color: #ffffff;
+  selection-background-color: rgba(255, 255, 255, 0.28);
+  selected-color: #ffffff;
+}
+#thepuchnotchIsland .thepuchnotch-stepper-entry:hover { background-color: rgba(255, 255, 255, 0.08) !important; }
+#thepuchnotchIsland .thepuchnotch-stepper-entry:focus,
+#thepuchnotchIsland .thepuchnotch-stepper-entry:focus:hover { background-color: rgba(255, 255, 255, 0.16) !important; }
+.thepuchnotch-stepper-button { padding: 6px; border-radius: 999px; color: rgba(255, 255, 255, 0.8); }
+.thepuchnotch-stepper-button:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.1); }
+/* While a session runs the lengths are locked (timer.js): each reads on in grey, its − / + faint. */
+#thepuchnotchIsland .thepuchnotch-stepper-locked .thepuchnotch-stepper-entry { color: rgba(255, 255, 255, 0.6) !important; }
+
+/* Reset as tall as Start beside it. */
+.thepuchnotch-timer-controls { spacing: 8px; }
+.thepuchnotch-timer-controls .thepuchnotch-button-round { padding: 10px; }
+.thepuchnotch-start-pill { padding: 8px 18px; border-radius: 999px; color: #ffffff; background-color: #2c2c2e; }
+.thepuchnotch-start-pill:hover { background-color: #3a3a3c; }
+.thepuchnotch-start-pill-box { spacing: 7px; }
+.thepuchnotch-start-pill-label { font-size: 14px; font-weight: 600; }
+
+/* ── Lists (notifications, calendar) ──────────────────── */
+
+/* Lists fade out at an edge that scrolls on, instead of being cut. */
+.thepuchnotch-task-scroll { padding: 6px 0; -st-vfade-offset: 18px; }
+.thepuchnotch-task-add-icon { color: rgba(255, 255, 255, 0.5); padding-right: 4px; }
+.thepuchnotch-task-remove { padding: 3px; color: rgba(255, 255, 255, 0.7); }
+
+/* ── Reminders ────────────────────────────────────────── */
+
+/* Reminders: an orange title and count (as large as the timer's caption beside it), rows of a ring and a title
+ * over a hairline. A 24 px header and 24 px rows fit five whole rows in the 144 px page. */
+.thepuchnotch-reminders-header { height: 25px; padding: 0; spacing: 8px; }
+.thepuchnotch-reminders-title { font-size: 17px; font-weight: 600; color: #ff9f0a; letter-spacing: -0.2px; }
+.thepuchnotch-reminders-count { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; color: #ff9f0a; padding-right: 2px; }
+
+/* Lists fade out at an edge that scrolls on, instead of being cut. */
+.thepuchnotch-reminder-scroll { -st-vfade-offset: 14px; }
+.thepuchnotch-reminder { min-height: 24px; spacing: 10px; }
+/* The ring by the first line; a wrapped title gets a little air above and below. */
+.thepuchnotch-reminder .thepuchnotch-reminder-check { margin-top: 3px; }
+.thepuchnotch-reminder-new .thepuchnotch-reminder-check { margin-top: 0; }
+.thepuchnotch-reminder-title-box { padding: 3px 0; }
+
+/* An 18 px ring; ticked, it turns orange with a 10 px dot inside. */
+.thepuchnotch-reminder-check {
+  width: 10px;
+  height: 10px;
+  padding: 2.5px;
+  border-radius: 99px;
+  border: 1.5px solid rgba(255, 255, 255, 0.32);
+  transition-duration: 160ms;
+}
+
+.thepuchnotch-reminder-check:hover { border-color: rgba(255, 255, 255, 0.6); }
+.thepuchnotch-reminder-check:checked { border-color: #ff9f0a; }
+.thepuchnotch-reminder-check.faint { border-color: rgba(255, 255, 255, 0.14); }
+.thepuchnotch-reminder-dot { border-radius: 99px; background-color: #ff9f0a; }
+
+.thepuchnotch-reminder-content { spacing: 6px; padding-right: 2px; }
+/* The hairline runs under the text, from the title to the edge. */
+.thepuchnotch-reminder-line { height: 1px; background-color: rgba(255, 255, 255, 0.1); }
+.thepuchnotch-reminder-title { font-size: 13px; color: #ffffff; transition-duration: 200ms; }
+.thepuchnotch-reminder-title.done { color: rgba(255, 255, 255, 0.38); }
+.thepuchnotch-reminder-strike { height: 1.5px; background-color: rgba(255, 255, 255, 0.45); }
+.thepuchnotch-reminder-remove { padding: 3px; border-radius: 99px; color: rgba(255, 255, 255, 0.5); }
+.thepuchnotch-reminder-remove:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.1); }
+
+.thepuchnotch-reminders-empty { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.55); padding-top: 22px; }
+
+/* Plain text fields, inside the row (Blur my Shell restyles entries with !important). */
+#thepuchnotchIsland .thepuchnotch-reminder-field,
+#thepuchnotchIsland .thepuchnotch-reminder-field:focus {
+  font-size: 13px;
+  padding: 0;
+  border: none;
+  color: #ffffff !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  caret-color: #ffffff;
+  /* Not the theme's accent (orange on Ubuntu): a quiet selection, as the assistant's field has. */
+  selection-background-color: rgba(255, 255, 255, 0.28);
+  selected-color: #ffffff;
+}
+
+/* GNOME indents the placeholder (more since 49); here it lines up with the titles above. In the other
+ * fields it starts just past the cursor, which would cross its first letter. */
+#thepuchnotchIsland .thepuchnotch-reminder-field StLabel.hint-text { color: rgba(255, 255, 255, 0.45); margin-left: 0; padding-left: 0; }
+#thepuchnotchIsland .thepuchnotch-entry StLabel.hint-text, #thepuchnotchIsland .thepuchnotch-voice-entry StLabel.hint-text { margin-left: 6px; padding-left: 0; }
+/* The Calendar's on the events' titles below it, as the Reminders' field is. */
+#thepuchnotchIsland .thepuchnotch-cal-add StLabel.hint-text { margin-left: 0; }
+
+/* ── Calendar ─────────────────────────────────────────── */
+
+/* The month, as a calendar widget shows it. */
+.thepuchnotch-cal-month { width: 196px; spacing: 2px; }
+.thepuchnotch-cal-month-header { spacing: 0; padding-bottom: 2px; }
+.thepuchnotch-cal-month-title { padding: 1px 4px; border-radius: 6px; }
+.thepuchnotch-cal-month-title:hover { background-color: rgba(255, 255, 255, 0.06); }
+.thepuchnotch-cal-month-title-box { spacing: 5px; }
+/* No letter-spacing: St rounds it to whole pixels (none at 100%, 1px at 200%), and Pango then cut the
+ * name at the width St measured for it ("OCTOB…"). */
+.thepuchnotch-cal-month-name { font-size: 12px; font-weight: 700; color: #ff453a; }
+.thepuchnotch-cal-year { font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, 0.5); }
+.thepuchnotch-cal-arrow { padding: 4px; color: rgba(255, 255, 255, 0.75); }
+
+.thepuchnotch-cal-weekdays { padding-bottom: 1px; }
+.thepuchnotch-cal-weekday {
+  width: 28px;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.55);
+}
+.thepuchnotch-cal-weekday.weekend { color: rgba(255, 255, 255, 0.5); }
+
+.thepuchnotch-cal-cell { width: 28px; }
+
+.thepuchnotch-cal-day {
+  width: 19px;
+  height: 19px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffffff;
+  transition-duration: 120ms;
+}
+
+.thepuchnotch-cal-day:hover { background-color: rgba(255, 255, 255, 0.12); }
+.thepuchnotch-cal-day:focus { background-color: rgba(255, 255, 255, 0.1); color: #ffffff; }
+.thepuchnotch-cal-day.weekend { color: rgba(255, 255, 255, 0.55); }
+.thepuchnotch-cal-day.selected { background-color: rgba(255, 255, 255, 0.22); }
+.thepuchnotch-cal-day.today { background-color: #ff453a; font-weight: 700; }
+.thepuchnotch-cal-day.today:hover { background-color: #ff5f55; }
+/* Six weeks in a month have 17 px rows: smaller days, still round. */
+.thepuchnotch-cal-six-weeks .thepuchnotch-cal-day { width: 17px; height: 17px; border-radius: 9px; }
+/* A taller page (Settings → Size: Large): larger days, as many weeks in its rows. */
+.thepuchnotch-cal-tall .thepuchnotch-cal-day { width: 24px; height: 24px; border-radius: 12px; font-size: 13px; }
+.thepuchnotch-cal-tall.thepuchnotch-cal-six-weeks .thepuchnotch-cal-day { width: 22px; height: 22px; border-radius: 11px; font-size: 12px; }
+/* Its dot kept in the circle's bottom edge, the rows taller than the days: (row − day) / 2 above the row's bottom. */
+.thepuchnotch-cal-tall .thepuchnotch-cal-dot { margin-bottom: 5px; }
+.thepuchnotch-cal-tall.thepuchnotch-cal-six-weeks .thepuchnotch-cal-dot { margin-bottom: 3px; }
+
+/* A day with events: a dot just under its number. */
+.thepuchnotch-cal-dot {
+  width: 3px;
+  height: 3px;
+  margin-bottom: 1px;
+  border-radius: 2px;
+  background-color: rgba(255, 255, 255, 0.55);
+}
+.thepuchnotch-cal-dot.on-today { background-color: #ffffff; }
+
+/* The day's events. */
+.thepuchnotch-cal-agenda { spacing: 5px; }
+.thepuchnotch-cal-day-header { spacing: 8px; }
+.thepuchnotch-cal-day-name { font-size: 14px; font-weight: 600; letter-spacing: -0.1px; }
+
+.thepuchnotch-cal-today {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+  color: #ffffff;
+  background-color: #2c2c2e;
+}
+
+.thepuchnotch-cal-today:hover { background-color: #3a3a3c; }
+/* Its + over the rows' dots and icons, its text where their titles start (.thepuchnotch-cal-event-dot). */
+/* 30 px however its text measures, its text centred in it (as the Shelf's search field). */
+.thepuchnotch-cal-add { height: 30px; min-height: 0; padding: 0 12px 0 11px; font-size: 13px; }
+/* Where a new event goes, inside the field: the calendar's colour, its name and a chevron. */
+/* The end of the add field: when the line takes place, then the calendar chip. */
+.thepuchnotch-cal-field-end { spacing: 8px; }
+.thepuchnotch-cal-preview { font-size: 12px; font-weight: 500; color: rgba(255, 255, 255, 0.55); font-feature-settings: "tnum"; }
+.thepuchnotch-cal-target { spacing: 5px; padding: 2px 7px 2px 6px; border-radius: 999px; background-color: rgba(255, 255, 255, 0.08); }
+.thepuchnotch-cal-target:hover, .thepuchnotch-cal-target:checked { background-color: rgba(255, 255, 255, 0.16); }
+.thepuchnotch-cal-target-dot { width: 7px; height: 7px; border-radius: 4px; }
+.thepuchnotch-cal-target-name { font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, 0.8); max-width: 96px; }
+.thepuchnotch-cal-target-arrow { color: rgba(255, 255, 255, 0.55); }
+/* The calendars to pick from, a row each: colour, name, its account in grey, a tick. */
+.thepuchnotch-cal-target-row { border-radius: 8px; padding: 5px 10px; }
+.thepuchnotch-cal-target-row:hover { background-color: rgba(255, 255, 255, 0.06); }
+.thepuchnotch-cal-target-row-box { spacing: 8px; }
+.thepuchnotch-cal-target-row-name { font-size: 13px; font-weight: 600; }
+.thepuchnotch-cal-target-row-account { font-size: 12px; color: rgba(255, 255, 255, 0.46); max-width: 190px; }
+.thepuchnotch-cal-target-tick { color: #ffffff; }
+.thepuchnotch-cal-scroll { -st-vfade-offset: 14px; }
+.thepuchnotch-cal-events { spacing: 3px; padding-bottom: 2px; }
+
+/* An event: its calendar's colour as a dot (set in
+ * calendar.js), on a row like the world clocks'. */
+.thepuchnotch-cal-event {
+  spacing: 8px;
+  padding: 0 8px 0 10px;
+  min-height: 26px;
+  border-radius: 7px;
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+/* In a 16 px slot, as the world clocks' icons, so every row's title starts at the same place. */
+.thepuchnotch-cal-event-dot, .thepuchnotch-cal-target-row .thepuchnotch-cal-target-dot { width: 7px; height: 7px; border-radius: 4px; margin: 0 5px 0 4px; }
+/* Kept in thepuchnotch until its calendar is in reach: a ring of that one's colour. */
+.thepuchnotch-cal-event-dot.waiting { width: 4px; height: 4px; border: 1.5px solid transparent; background-color: transparent; }
+.thepuchnotch-cal-event-title { font-size: 13px; font-weight: 600; }
+.thepuchnotch-cal-event-time { font-size: 11px; font-weight: 500; color: rgba(255, 255, 255, 0.65); }
+/* World clocks, in place of the events: as their rows, untinted. */
+.thepuchnotch-cal-world-toggle { padding: 4px; border-radius: 999px; transition-duration: 120ms; }
+.thepuchnotch-cal-world-toggle:hover { background-color: rgba(255, 255, 255, 0.1); }
+.thepuchnotch-cal-world-toggle:checked { background-color: rgba(255, 255, 255, 0.18); }
+.thepuchnotch-cal-world-row {
+  spacing: 8px;
+  padding: 0 10px;
+  min-height: 26px;
+  border-radius: 7px;
+  background-color: rgba(255, 255, 255, 0.07);
+}
+.thepuchnotch-cal-world-icon { icon-size: 16px; color: rgba(255, 255, 255, 0.9); }
+.thepuchnotch-cal-world-city { font-size: 13px; font-weight: 600; }
+.thepuchnotch-cal-world-meta { font-size: 11px; font-weight: 500; color: rgba(255, 255, 255, 0.55); }
+.thepuchnotch-cal-world-time { font-size: 13px; font-weight: 600; font-feature-settings: "tnum"; }
+.thepuchnotch-cal-world-strip {
+  padding: 3px 2px 0 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  transition-duration: 120ms;
+}
+.thepuchnotch-cal-world-strip:hover .thepuchnotch-cal-world-chip-city { color: rgba(255, 255, 255, 0.8); }
+.thepuchnotch-cal-world-strip-box { spacing: 14px; }
+.thepuchnotch-cal-world-chip { spacing: 5px; }
+.thepuchnotch-cal-world-chip-city { font-size: 11px; font-weight: 500; color: rgba(255, 255, 255, 0.55); }
+.thepuchnotch-cal-world-chip-time { font-size: 11px; font-weight: 600; font-feature-settings: "tnum"; }
+.thepuchnotch-cal-empty { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.55); }
+.thepuchnotch-cal-accounts { font-size: 12px; color: rgba(10, 132, 255, 1); padding: 4px 8px; border-radius: 8px; }
+.thepuchnotch-cal-accounts:hover { background-color: rgba(255, 255, 255, 0.08); }
+.thepuchnotch-cal-accounts:focus { color: #ffffff; }
+
+/* ── Notifications ────────────────────────────────────── */
+
+/* As the rows' insides: the heading over their icons, Clear over their times. */
+.thepuchnotch-notifications-bar { spacing: 6px; padding: 0 10px 6px 10px; }
+.thepuchnotch-notifications-heading { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.6); }
+.thepuchnotch-notifications-clear { font-size: 12px; font-weight: 600; padding: 5px 12px; }
+.thepuchnotch-dnd-toggle:checked { color: #ffffff; background-color: #5e5ce6; }
+.thepuchnotch-dnd-toggle:checked:hover { background-color: #6e6cf0; }
+.thepuchnotch-notifications-dnd-note { spacing: 6px; padding: 0 10px 8px 10px; }
+.thepuchnotch-notifications-dnd-text { font-size: 12px; color: rgba(255, 255, 255, 0.5); }
+.thepuchnotch-notification-list { spacing: 6px; padding-bottom: 8px; }
+
+/* A card each, apart from the next: the app's icon, who in white and what in grey under it, then when;
+ * its buttons under them. */
+.thepuchnotch-notification-row {
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  transition-duration: 120ms;
+}
+
+.thepuchnotch-notification-row:hover { background-color: rgba(255, 255, 255, 0.09); }
+.thepuchnotch-notification { spacing: 10px; padding: 8px 10px; }
+.thepuchnotch-notification-texts { spacing: 2px; }
+.thepuchnotch-notification-title { font-size: 13px; font-weight: 600; }
+.thepuchnotch-notification-body { font-size: 13px; color: rgba(255, 255, 255, 0.55); }
+.thepuchnotch-notification-tools { spacing: 6px; }
+/* A notification's buttons, under its line, from where the title starts. */
+.thepuchnotch-notification-actions { padding-top: 6px; }
+.thepuchnotch-notification-action { font-size: 11px; padding: 3px 10px; }
+.thepuchnotch-notification-dismiss { padding: 4px; border-radius: 999px; color: rgba(255, 255, 255, 0.7); background-color: #3a3a3c; }
+
+/* A system notification's symbolic icon, on a tile the size of an app icon. */
+.thepuchnotch-notification-glyph {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background-color: #2c2c2e;
+  color: #ffffff;
+}
+.thepuchnotch-notification-time { font-size: 12px; color: rgba(255, 255, 255, 0.46); padding-left: 8px; }
+
+.thepuchnotch-dnd-moon { color: rgba(255, 255, 255, 0.85); }
+
+/* ── Shelf ────────────────────────────────────────────── */
+
+/* Shelf: tabs, filters and search in one bar, cards below */
+
+.thepuchnotch-shelf-bar { spacing: 8px; }
+.thepuchnotch-shelf-controls { spacing: 8px; }
+
+/* A segmented control: the chosen segment is a raised pill,
+ * lit from above with a soft shadow beneath (no outline). */
+.thepuchnotch-segmented {
+  padding: 3px;
+  spacing: 2px;
+  border-radius: 999px;
+  background-color: #1c1c1e;
+}
+
+.thepuchnotch-segment {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.6);
+  transition-duration: 120ms;
+}
+
+.thepuchnotch-segment:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.05); }
+.thepuchnotch-segment:checked {
+  color: #ffffff;
+  background-gradient-direction: vertical;
+  background-gradient-start: #4a4a4d;
+  background-gradient-end: #3a3a3c;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+/* Icons in segments as tall as the text ones (13 + 5 + 5 = 23): the filters and the tabs line up at 29. */
+.thepuchnotch-segmented-icons .thepuchnotch-segment { padding: 5px 7px; }
+
+/* As tall as the tabs beside it (3 + 23 + 3), however its text measures: the row never grows as it opens. */
+.thepuchnotch-shelf-field { height: 29px; min-height: 0; padding: 0 12px; font-size: 12px; }
+.thepuchnotch-shelf-field-icon { padding-right: 6px; }
+.thepuchnotch-shelf-confirm { padding: 5px 12px; }
+.thepuchnotch-shelf-hint { font-size: 12px; color: rgba(255, 255, 255, 0.55); transition-duration: 180ms; }
+/* While a file is on its way in. */
+.thepuchnotch-shelf-hint.active { color: #ffffff; font-weight: 600; }
+
+.thepuchnotch-clips-scroll { -st-hfade-offset: 18px; }
+.thepuchnotch-clips { spacing: 8px; }
+
+.thepuchnotch-clip {
+  width: 136px;
+  /* 107 with its border, as the row has always given it: its own height now, so a taller page (Settings → Size)
+   * leaves the cards as they are (their pictures are made for it, #24). */
+  height: 103px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background-color: #1c1c1e;
+  color: #ffffff;
+}
+
+.thepuchnotch-clip:hover { background-color: #242426; }
+/* The keyboard's choice, for Enter to paste. */
+.thepuchnotch-clip:selected { border-color: #ffffff; }
+
+.thepuchnotch-clip-header { padding: 7px 9px; spacing: 5px; }
+.thepuchnotch-clip-age { font-size: 12px; color: rgba(255, 255, 255, 0.5); }
+.thepuchnotch-clip-body { padding: 28px 10px 8px 10px; spacing: 2px; }
+.thepuchnotch-clip-text { font-size: 12px; }
+.thepuchnotch-clip-code { font-family: monospace; font-size: 12px; }
+.thepuchnotch-clip-host { font-size: 13px; font-weight: 700; }
+.thepuchnotch-clip-url { font-size: 12px; color: rgba(255, 255, 255, 0.55); }
+.thepuchnotch-clip-file-name { font-size: 12px; font-weight: 600; padding-top: 4px; }
+.thepuchnotch-clip-subtle { font-size: 12px; color: rgba(255, 255, 255, 0.5); }
+
+/* Images fill the card; header and size sit on dark pills over them. */
+.thepuchnotch-clip-thumb { border-radius: 12px; background-size: cover; background-color: #2c2c2e; }
+.thepuchnotch-clip-image .thepuchnotch-clip-header {
+  margin: 5px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.thepuchnotch-clip-badge { margin: 5px; padding: 2px 6px; border-radius: 999px; background-color: rgba(0, 0, 0, 0.6); }
+.thepuchnotch-clip-badge-label { font-size: 11px; font-weight: 600; }
+
+.thepuchnotch-clip-actions { padding: 5px; spacing: 4px; }
+.thepuchnotch-clip-action { padding: 4px; background-color: #3a3a3c; }
+.thepuchnotch-clip-action:hover { background-color: #4a4a4c; }
+
+.thepuchnotch-clip-feedback { border-radius: 12px; background-color: rgba(28, 28, 30, 0.95); }
+.thepuchnotch-clip-feedback-label { font-size: 12px; font-weight: 700; padding-top: 4px; }
+
+/* Files tab. The shelf helper's window draws this tab when installed; its
+ * style.css mirrors these sizes and colours so the two look the same. */
+
+/* While a file is on its way, a dashed outline (drawn in files.js) marks it as one rounded area. */
+.thepuchnotch-shelf-files { border-radius: 16px; }
+
+/* In 1 px at the sides, as the helper's row inside its drop area's 1 px border (crates/thepuchnotch-shelf/src/style.css): the
+ * window's tiles land on these exactly. */
+.thepuchnotch-shelf-tiles { spacing: 6px; padding: 0 1px; }
+
+.thepuchnotch-shelf-tile {
+  padding: 6px 0;
+  border-radius: 14px;
+  color: #ffffff;
+  transition-duration: 120ms;
+}
+
+.thepuchnotch-shelf-tile:hover { background-color: #1c1c1e; }
+.thepuchnotch-shelf-tile:focus { background-color: rgba(255, 255, 255, 0.1); }
+.thepuchnotch-shelf-tile-box { spacing: 4px; }
+/* Two lines high, a shorter name in the middle, as the drag-and-drop helper's (crates/thepuchnotch-shelf). */
+.thepuchnotch-shelf-name { font-size: 12px; text-align: center; }
+.thepuchnotch-shelf-name-lines { font-size: 12px; height: 2.5em; }
+
+.thepuchnotch-shelf-preview { border-radius: 12px; }
+.thepuchnotch-shelf-preview.thumbnail { background-color: #2c2c2e; background-size: cover; }
+/* A document's page, whole on a clear square, as in Files. */
+.thepuchnotch-shelf-preview.thumbnail.whole { background-color: transparent; border-radius: 0; }
+
+.thepuchnotch-shelf-copied { border-radius: 12px; background-color: rgba(0, 0, 0, 0.6); }
+
+/* Always there, so a file can always be taken off the shelf. */
+.thepuchnotch-shelf-remove {
+  padding: 0;
+  border-radius: 9px;
+  color: #ffffff;
+  background-color: #3a3a3c;
+}
+
+.thepuchnotch-shelf-remove:hover { background-color: #5a5a5e; }
+
+/* ── Shelf: sharing with a phone ─────────────────────── */
+
+.thepuchnotch-shelf-column { spacing: 8px; }
+.thepuchnotch-shelf-phone { padding: 5px 12px 5px 10px; }
+.thepuchnotch-shelf-phone-box { spacing: 5px; }
+/* The Phone tab: one column from the top, every block 6 px under the one before (its own bottom padding). */
+.thepuchnotch-phone { spacing: 0; }
+.thepuchnotch-phone-title { font-size: 15px; font-weight: 600; letter-spacing: -0.1px; padding-bottom: 6px; }
+.thepuchnotch-phone-steps { spacing: 2px; padding-bottom: 6px; }
+.thepuchnotch-phone-step { spacing: 8px; }
+.thepuchnotch-phone-step-number { width: 16px; height: 16px; border-radius: 8px; background-color: rgba(255, 255, 255, 0.14); }
+/* A pixel over the digit: the font's line keeps room below it that digits never use. */
+.thepuchnotch-phone-step-digit { font-size: 10px; font-weight: 700; font-feature-settings: "tnum"; padding-top: 1px; }
+.thepuchnotch-phone-step-text { font-size: 12px; color: rgba(255, 255, 255, 0.82); }
+.thepuchnotch-phone-warning { color: #ff9f0a; }
+.thepuchnotch-phone-hint,
+.thepuchnotch-phone-copy-text { font-size: 12px; color: rgba(255, 255, 255, 0.55); }
+.thepuchnotch-phone-rows { spacing: 0; }
+.thepuchnotch-phone-row { padding-bottom: 6px; }
+.thepuchnotch-phone-status { spacing: 8px; }
+.thepuchnotch-phone-dot { width: 7px; height: 7px; border-radius: 4px; background-color: rgba(255, 255, 255, 0.35); }
+.thepuchnotch-phone-dot.on { background-color: #30d158; }
+.thepuchnotch-phone-status-text { font-size: 12px; font-weight: 600; }
+.thepuchnotch-phone-leaving .thepuchnotch-phone-status-text,
+.thepuchnotch-phone-away .thepuchnotch-phone-status-text { font-weight: 400; color: rgba(255, 255, 255, 0.55); }
+.thepuchnotch-phone-ask { spacing: 8px; }
+.thepuchnotch-phone-note { spacing: 6px; color: #ff9f0a; padding-bottom: 6px; }
+.thepuchnotch-phone-note-icon { padding-top: 1px; }
+.thepuchnotch-phone-note-text { font-size: 12px; color: #ff9f0a; }
+.thepuchnotch-phone-copy { spacing: 8px; }
+.thepuchnotch-phone-code-text { font-size: 13px; font-weight: 700; font-feature-settings: "tnum"; }
+.thepuchnotch-phone-remove { padding: 4px; border-radius: 999px; background-color: #2c2c2e; }
+.thepuchnotch-phone-remove:hover { background-color: #3a3a3c; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-phone-remove { background-color: rgba(255, 255, 255, 0.14); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-phone-remove:hover { background-color: rgba(255, 255, 255, 0.22); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-phone-hint,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-phone-copy-text,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-phone-leaving .thepuchnotch-phone-status-text,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-phone-away .thepuchnotch-phone-status-text { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-phone-step-text { color: rgba(255, 255, 255, 0.9); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-phone-step-number { background-color: rgba(255, 255, 255, 0.2); }
+/* Signal colours a quarter towards white on glass. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-phone-dot.on { background-color: rgb(100, 220, 130); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-phone-note,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-phone-note-text,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-phone-warning { color: rgb(255, 183, 71); }
+
+/* ── Usage ────────────────────────────────────────────── */
+
+/* One provider at a time (usage.js): its mark, name and plan, then a line and a bar per limit;
+ * dots on the right move between providers, as in a widget stack. */
+.thepuchnotch-usage-content { spacing: 14px; padding: 0 0 4px 0; }
+.thepuchnotch-usage-head { spacing: 8px; }
+.thepuchnotch-usage-mark { width: 10px; height: 10px; border-radius: 5px; }
+.thepuchnotch-usage-name { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+.thepuchnotch-usage-plan {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 99px;
+  color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.thepuchnotch-usage-stamp { font-size: 11px; color: rgba(255, 255, 255, 0.55); }
+.thepuchnotch-usage-stamp.warning { color: rgba(255, 255, 255, 0.8); }
+.thepuchnotch-usage-limits { spacing: 11px; }
+.thepuchnotch-usage-limit { spacing: 5px; }
+.thepuchnotch-usage-line { spacing: 10px; }
+.thepuchnotch-usage-window { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.9); }
+.thepuchnotch-usage-reset { font-size: 11px; color: rgba(255, 255, 255, 0.55); }
+.thepuchnotch-usage-percent { font-size: 13px; font-weight: 700; min-width: 40px; text-align: right; }
+.thepuchnotch-usage-percent.critical { color: #ff453a; }
+.thepuchnotch-usage-track { height: 5px; border-radius: 3px; background-color: rgba(255, 255, 255, 0.1); }
+.thepuchnotch-usage-fill { height: 5px; border-radius: 3px; }
+.thepuchnotch-usage-fill.critical { background-color: #ff453a; }
+.thepuchnotch-usage-empty { font-size: 12px; color: rgba(255, 255, 255, 0.55); }
+
+.thepuchnotch-usage-dots { spacing: 6px; padding-left: 14px; }
+.thepuchnotch-usage-dot { width: 6px; height: 6px; border-radius: 3px; background-color: rgba(255, 255, 255, 0.22); transition-duration: 200ms; }
+.thepuchnotch-usage-dot:hover { background-color: rgba(255, 255, 255, 0.45); }
+.thepuchnotch-usage-dot.shown { height: 16px; background-color: #ffffff; }
+
+/* Apps: time in each application, today or over the last seven days */
+
+/* On the page's edges, as the rows below: the heading over their icons, the periods over their times. */
+.thepuchnotch-apps-bar { spacing: 10px; padding: 0 0 6px 0; }
+.thepuchnotch-apps-heading { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.6); }
+.thepuchnotch-apps-total { font-size: 11px; color: rgba(255, 255, 255, 0.46); }
+.thepuchnotch-apps-scroll { padding: 2px 0 6px 0; -st-vfade-offset: 16px; }
+.thepuchnotch-apps-list { spacing: 8px; }
+.thepuchnotch-apps-row { spacing: 10px; }
+.thepuchnotch-apps-name { font-size: 13px; color: rgba(255, 255, 255, 0.92); }
+.thepuchnotch-apps-track { width: 120px; height: 4px; border-radius: 2px; background-color: rgba(255, 255, 255, 0.1); }
+.thepuchnotch-apps-fill { height: 4px; border-radius: 2px; background-color: rgba(255, 255, 255, 0.8); }
+.thepuchnotch-apps-time { font-size: 12px; color: rgba(255, 255, 255, 0.6); min-width: 44px; text-align: right; }
+
+/* ── Devices ──────────────────────────────────────────── */
+
+/* A card per connected device, every one alike, a shade lighter than the island: the device's icon in white on a
+ * grey tile, its name in white and "Connected" in grey under it (a green dot first; "Low battery" in red), then its
+ * battery on its side, filled from the left to the level in green, and the level, right-aligned in a fixed width so
+ * the batteries line up; both red when low. The battery and the level keep their width, the name gives way. 52 px
+ * tall, the tile 10 px from the card's edge (its 8 px corners within the card's 12); three rows to the page take
+ * 42 px, a touch denser (`thepuchnotch-devices-dense`). How the cards sit is devices.js's. */
+.thepuchnotch-device-card { spacing: 12px; padding: 0 14px 0 10px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.07); }
+.thepuchnotch-device-tile { width: 32px; height: 32px; border-radius: 8px; background-color: rgba(255, 255, 255, 0.14); }
+.thepuchnotch-device-icon { icon-size: 16px; color: #ffffff; }
+.thepuchnotch-device-texts { spacing: 2px; }
+.thepuchnotch-device-name { font-size: 14px; font-weight: 600; color: #ffffff; }
+.thepuchnotch-device-status { spacing: 6px; font-size: 12px; }
+.thepuchnotch-device-dot { width: 6px; height: 6px; border-radius: 3px; background-color: #30d158; }
+.thepuchnotch-device-connected, .thepuchnotch-device-none { color: rgba(255, 255, 255, 0.55); }
+.thepuchnotch-device-none { font-size: 12px; }
+.thepuchnotch-device-power { spacing: 8px; }
+.thepuchnotch-device-battery { spacing: 1px; }
+.thepuchnotch-device-battery-body {
+  width: 22px;
+  height: 11px;
+  padding: 1px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 4px;
+}
+.thepuchnotch-device-battery-fill { border-radius: 2px; background-color: #30d158; }
+.thepuchnotch-device-battery-nub { width: 2px; height: 4px; border-radius: 0 1px 1px 0; background-color: rgba(255, 255, 255, 0.45); }
+.thepuchnotch-device-level { min-width: 34px; font-size: 13px; font-weight: 600; color: #ffffff; text-align: right; font-feature-settings: "tnum"; }
+.thepuchnotch-device-card.low .thepuchnotch-device-battery-fill,
+.thepuchnotch-device-card.low .thepuchnotch-device-dot { background-color: #ff453a; }
+.thepuchnotch-device-card.low .thepuchnotch-device-level,
+.thepuchnotch-device-card.low .thepuchnotch-device-connected { color: #ff453a; }
+
+/* Three rows to the page: 42 px cards, the tile 7 px from the edge. */
+.thepuchnotch-devices-dense .thepuchnotch-device-card { spacing: 10px; padding: 0 12px 0 7px; }
+.thepuchnotch-devices-dense .thepuchnotch-device-tile { width: 28px; height: 28px; border-radius: 7px; }
+.thepuchnotch-devices-dense .thepuchnotch-device-icon { icon-size: 14px; }
+.thepuchnotch-devices-dense .thepuchnotch-device-texts { spacing: 0; }
+.thepuchnotch-devices-dense .thepuchnotch-device-name { font-size: 13px; }
+.thepuchnotch-devices-dense .thepuchnotch-device-status, .thepuchnotch-devices-dense .thepuchnotch-device-none { font-size: 11px; }
+.thepuchnotch-devices-dense .thepuchnotch-device-level { min-width: 32px; font-size: 12px; }
+.thepuchnotch-devices-scroll { -st-vfade-offset: 16px; }
+
+/* Focused (from the keyboard), a button lights up: no ring around it. */
+.thepuchnotch-pill:focus, .thepuchnotch-pill-small:focus, .thepuchnotch-notification-row:focus, .thepuchnotch-output-button:focus,
+.thepuchnotch-cal-today:focus, .thepuchnotch-cal-month-title:focus, .thepuchnotch-segment:focus, .thepuchnotch-usage-dot:focus,
+.thepuchnotch-recording-pill:focus {
+  color: #ffffff;
+}
+
+/* ── Glass theme ──────────────────────────────────────── */
+
+/* island-theme "glass" (theme.js, glass.js): a see-through island, all on it the same material. Greys
+ * a + 33% of the rest; rows 8% with a lit rim; buttons 14% lit along the top; wells 20% black; on is the accent. */
+
+/* Text, generated from the rules above (each grey, and the states of the same elements, in their order). */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-button:focus { color: #ffffff; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-art-placeholder { color: rgba(255, 255, 255, 0.6); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-empty-icon { color: rgba(255, 255, 255, 0.56); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-empty-hint,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-peek-subtitle,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-heard { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-text-dim { color: rgba(255, 255, 255, 0.73); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-hint { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-step-tick { color: rgba(255, 255, 255, 0.63); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-step-text { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-heard-button:hover .thepuchnotch-voice-heard { color: rgba(255, 255, 255, 0.83); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-earlier { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-still { color: rgba(255, 255, 255, 0.64); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-undo-text { color: rgba(255, 255, 255, 0.73); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-subtitle { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-output,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-ghost .thepuchnotch-card-key { color: rgba(255, 255, 255, 0.64); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-denied { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-chat-title { color: rgba(255, 255, 255, 0.64); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-chat-new { color: rgba(255, 255, 255, 0.83); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-chat-new:hover { color: #ffffff; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-chat-time { color: rgba(255, 255, 255, 0.64); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-action { color: rgba(255, 255, 255, 0.8); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-action:hover { color: #ffffff; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-header-mic { color: rgba(255, 255, 255, 0.73); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-header-mic:hover { color: #ffffff; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-header-settings { color: rgba(255, 255, 255, 0.73); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-header-settings:hover { color: #ffffff; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-player-modes .thepuchnotch-button { color: rgba(255, 255, 255, 0.83); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-track-subtitle { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-time { color: rgba(255, 255, 255, 0.73); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-output-detail { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-lyrics-controls .thepuchnotch-mode-toggle { color: rgba(255, 255, 255, 0.83); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-side-artist { color: rgba(255, 255, 255, 0.73); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-lyrics-state-icon { color: rgba(255, 255, 255, 0.6); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-lyrics-state-hint { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-call-hint { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-call-kind { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-call-control-label { color: rgba(255, 255, 255, 0.73); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-timer-phase,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-stepper-name { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-task-add-icon { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-task-remove { color: rgba(255, 255, 255, 0.8); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminder-title.done { color: rgba(255, 255, 255, 0.58); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminder-remove { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminder-remove:hover { color: #ffffff; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminders-empty { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-year { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-arrow { color: rgba(255, 255, 255, 0.83); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-weekday { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-weekday.weekend { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-day.weekend,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-preview,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-target-arrow { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-target-row-account { color: rgba(255, 255, 255, 0.64); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-event-time { color: rgba(255, 255, 255, 0.77); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-compact-date { color: rgba(255, 255, 255, 0.8); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-world-meta,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-world-chip-city,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-empty { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-notifications-heading { color: rgba(255, 255, 255, 0.73); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-notifications-dnd-text { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-notification-body { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-notification-dismiss { color: rgba(255, 255, 255, 0.8); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-notification-time { color: rgba(255, 255, 255, 0.64); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-segment { color: rgba(255, 255, 255, 0.73); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-segment:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-segment:checked { color: #ffffff; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-shelf-hint { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-shelf-hint.active { color: #ffffff; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-clip-age { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-clip-url { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-clip-subtle { color: rgba(255, 255, 255, 0.67); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-usage-plan { color: rgba(255, 255, 255, 0.8); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-usage-stamp { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-usage-stamp.warning { color: rgba(255, 255, 255, 0.8); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-usage-reset,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-usage-empty { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-apps-heading { color: rgba(255, 255, 255, 0.73); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-apps-total { color: rgba(255, 255, 255, 0.64); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-apps-time { color: rgba(255, 255, 255, 0.73); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-device-card { background-color: rgba(255, 255, 255, 0.08); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-device-tile { background-color: rgba(255, 255, 255, 0.14); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-device-connected,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-device-none { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-device-battery-body { border-color: rgba(255, 255, 255, 0.6); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-device-battery-nub { background-color: rgba(255, 255, 255, 0.6); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-device-dot,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-device-battery-fill { background-color: #6fe08f; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-device-card.low .thepuchnotch-device-battery-fill,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-device-card.low .thepuchnotch-device-dot { background-color: #ff968d; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-device-card.low .thepuchnotch-device-level,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-device-card.low .thepuchnotch-device-connected { color: #ff968d; }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-device-card { background-color: rgba(255, 255, 255, 0.1); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-device-tile { background-color: rgba(255, 255, 255, 0.1); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-segment:focus { color: #ffffff; }
+
+/* Icon buttons: no fill until the pointer is on them (first: the buttons below have their own). */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-button:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-header-settings:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-stepper-button:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminder-remove:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-world-toggle:hover { background-color: rgba(255, 255, 255, 0.16); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-button:active { background-color: rgba(255, 255, 255, 0.24); }
+
+/* Buttons: frosted, lit along the top. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-button-round,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-pill-small,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-call-control,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-start-pill,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-today,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-chat-new,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-action {
+  background-color: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-button-round:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-pill-small:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-call-control:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-start-pill:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-today:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-chat-new:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-action:hover { background-color: rgba(255, 255, 255, 0.2); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-button-round:active,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-pill-small:active,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-call-control:active,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-start-pill:active,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-action:active { background-color: rgba(255, 255, 255, 0.26); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-stop { background-color: rgba(255, 255, 255, 0.2); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-send-mic { background-color: rgba(255, 255, 255, 0.16); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-send-mic:hover { background-color: rgba(255, 255, 255, 0.24); }
+/* Small round buttons over a row or a picture, a step brighter so they stand off it. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-notification-dismiss,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-clip-action,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-corner-close { background-color: rgba(255, 255, 255, 0.2); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-notification-dismiss:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-clip-action:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-corner-close:hover { background-color: rgba(255, 255, 255, 0.28); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-corner-close:active { background-color: rgba(255, 255, 255, 0.34); }
+
+/* Rows and cards: a pane of the same glass, a fill alone (a rim would read as a box drawn round it). */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-notification-row,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-event,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-world-row,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-clip,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-output-button.active {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-notification-row:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-clip:hover { background-color: rgba(255, 255, 255, 0.12); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-output-button:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-shelf-tile:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-target-row:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-month-title:hover { background-color: rgba(255, 255, 255, 0.1); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-output-button.active:hover { background-color: rgba(255, 255, 255, 0.12); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-shelf-tile:focus { background-color: rgba(255, 255, 255, 0.14); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-chat-user { background-color: rgba(255, 255, 255, 0.15); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-idea {
+  color: rgba(255, 255, 255, 0.86);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: transparent;
+}
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-idea:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.16); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-target { background-color: rgba(255, 255, 255, 0.12); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-target:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-target:checked { background-color: rgba(255, 255, 255, 0.18); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-accounts:hover { background-color: rgba(255, 255, 255, 0.12); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-usage-plan { background-color: rgba(255, 255, 255, 0.14); }
+
+/* Pictures and tiles that wait for a picture: frosted. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-art,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-clip-thumb,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-shelf-preview.thumbnail { background-color: rgba(255, 255, 255, 0.1); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-shelf-preview.thumbnail.whole { background-color: transparent; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-notification-glyph { background-color: rgba(255, 255, 255, 0.14); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-app-badge { background-color: #16171c; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-clip-feedback { background-color: rgba(20, 20, 26, 0.9); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-call-preview { background-color: rgba(0, 0, 0, 0.3); }
+
+/* Wells: a command or code sunk into the glass. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-terminal,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-peek-code,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-chat-command-text {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-ended .thepuchnotch-card-terminal { background-color: rgba(0, 0, 0, 0.14); }
+
+/* Tabs: the open one a frosted pill. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-tab:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-tab:focus { background-color: rgba(255, 255, 255, 0.08); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-tab:checked {
+  background-color: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* A segmented control and a stepper: a frosted channel, the choice raised in it. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-segmented,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-stepper { background-color: rgba(255, 255, 255, 0.08); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-segment:hover { background-color: rgba(255, 255, 255, 0.08); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-segment:checked {
+  background-gradient-direction: none;
+  background-color: rgba(255, 255, 255, 0.24);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Fields: a pane, no rim; focused, the accent's ring. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-entry { background-color: rgba(255, 255, 255, 0.1) !important; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-entry:focus {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: inset 0 0 0 2px rgba(53, 132, 228, 0.7) !important;
+}
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-entry,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-entry:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid transparent !important;
+}
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-entry:focus,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-entry:focus:hover {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+}
+/* The timer's typed lengths: quiet, a step brighter under the pointer and while typed in, the accent's caret. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-stepper-entry:hover { background-color: rgba(255, 255, 255, 0.12) !important; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-stepper-entry:focus,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-stepper-entry:focus:hover { background-color: rgba(255, 255, 255, 0.2) !important; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-entry StLabel.hint-text,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-entry StLabel.hint-text,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminder-field StLabel.hint-text { color: rgba(255, 255, 255, 0.72) !important; }
+
+/* Lines, tracks and rings a step brighter, to hold on lighter glass. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminder-line { background-color: rgba(255, 255, 255, 0.16); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-world-strip { border-top-color: rgba(255, 255, 255, 0.16); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminder-strike { background-color: rgba(255, 255, 255, 0.6); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminder-check { border-color: rgba(255, 255, 255, 0.46); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminder-check:hover { border-color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminder-check:checked { border-color: #ff9f0a; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminder-check.faint { border-color: rgba(255, 255, 255, 0.22); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-level { background-color: rgba(255, 255, 255, 0.22); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-slider-track { background-color: rgba(255, 255, 255, 0.24); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-usage-track,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-apps-track { background-color: rgba(255, 255, 255, 0.16); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-usage-dot { background-color: rgba(255, 255, 255, 0.3); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-usage-dot:hover { background-color: rgba(255, 255, 255, 0.55); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-usage-dot.shown { background-color: #ffffff; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-dot { background-color: rgba(255, 255, 255, 0.68); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-dot.on-today { background-color: #ffffff; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-day:hover { background-color: rgba(255, 255, 255, 0.16); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-day.selected { background-color: rgba(255, 255, 255, 0.26); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-day.today { background-color: #ff453a; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-day.today:hover { background-color: #ff5f55; }
+
+/* Signal colours lifted for the lighter grey, so they read without glaring: red, green, orange text and icons, links. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-recording-time,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-peek-denied,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-output-failed,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-risk-removes,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-failed,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-call-muted,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-compact-warning,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-month-name,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-usage-percent.critical { color: #ff968d; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-call-icon,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-call-duration,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-tab-call StIcon,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-peek-allowed,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-done,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-chat-copied,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-copied { color: #64dc82; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminders-title,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminders-count { color: #ffb340; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-accounts { color: #8cc4ff; }
+/* The closed island's dots, lifted a quarter towards white as the alerts' signs (Theme.semantic). */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-recording-dot { background-color: #ff7369; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-privacy-dot.camera { background-color: #67d582; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-privacy-dot.microphone { background-color: #ffb748; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-privacy-dot.screenShare { background-color: #47a3ff; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-privacy-dot.phone { background-color: #cf83f5; }
+/* A locked length a step brighter than on black, as all the greys here. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-stepper-locked .thepuchnotch-stepper-entry { color: rgba(255, 255, 255, 0.72) !important; }
+/* Text picked in a field: the accent, as in GNOME's own fields. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-entry,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-entry:focus:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-reminder-field { selection-background-color: rgba(53, 132, 228, 0.6); }
+
+/* Darker tints (controller.js adds the class by Settings' tint): the controls settle into GNOME Shell's own dark
+ * menus — flat, in its lighter greys — so on the dark glass nothing looks pasted on. Middle tint first, then dark. */
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-button-round,
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-pill-small,
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-call-control,
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-start-pill,
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-cal-today,
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-chat-new,
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-voice-action {
+  background-color: rgba(255, 255, 255, 0.115);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-button-round:hover,
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-pill-small:hover,
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-call-control:hover,
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-start-pill:hover,
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-cal-today:hover,
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-chat-new:hover,
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-voice-action:hover { background-color: rgba(255, 255, 255, 0.17); }
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-tab:checked {
+  background-color: rgba(255, 255, 255, 0.13);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+#thepuchnotchIsland.thepuchnotch-glass-mid .thepuchnotch-segment:checked { background-color: rgba(255, 255, 255, 0.19); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-button:hover { background-color: rgba(255, 255, 255, 0.1); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-button-round,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-pill-small,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-call-control,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-start-pill,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-cal-today,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-chat-new,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-voice-action {
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-button-round:hover,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-pill-small:hover,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-call-control:hover,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-start-pill:hover,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-cal-today:hover,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-chat-new:hover,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-voice-action:hover { background-color: rgba(255, 255, 255, 0.15); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-button-round:active,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-pill-small:active,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-call-control:active,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-start-pill:active,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-voice-action:active { background-color: rgba(255, 255, 255, 0.2); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-notification-dismiss,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-clip-action,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-corner-close { background-color: rgba(255, 255, 255, 0.14); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-notification-dismiss:hover,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-clip-action:hover,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-corner-close:hover { background-color: rgba(255, 255, 255, 0.2); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-notification-row,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-cal-event,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-cal-world-row,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-clip,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-output-button.active { background-color: rgba(255, 255, 255, 0.1); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-notification-row:hover,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-clip:hover { background-color: rgba(255, 255, 255, 0.15); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-chat-user,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-usage-plan { background-color: rgba(255, 255, 255, 0.1); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-voice-idea,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-cal-target,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-art,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-clip-thumb,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-shelf-preview.thumbnail,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-notification-glyph { background-color: rgba(255, 255, 255, 0.08); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-shelf-preview.thumbnail.whole { background-color: transparent; }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-tab:hover,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-tab:focus { background-color: rgba(255, 255, 255, 0.06); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-tab:checked { background-color: rgba(255, 255, 255, 0.1); box-shadow: none; }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-segmented,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-stepper { background-color: rgba(255, 255, 255, 0.07); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-segment:hover { background-color: rgba(255, 255, 255, 0.06); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-segment:checked { background-color: rgba(255, 255, 255, 0.16); box-shadow: none; }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-entry { background-color: rgba(255, 255, 255, 0.08) !important; }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-entry:focus { background-color: rgba(255, 255, 255, 0.12) !important; }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-voice-entry,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-voice-entry:hover { background-color: rgba(255, 255, 255, 0.08) !important; }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-voice-entry:focus,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-voice-entry:focus:hover { background-color: rgba(255, 255, 255, 0.12) !important; }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-slider-track { background-color: rgba(255, 255, 255, 0.18); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-level { background-color: rgba(255, 255, 255, 0.16); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-usage-track,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-apps-track { background-color: rgba(255, 255, 255, 0.12); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-reminder-line { background-color: rgba(255, 255, 255, 0.12); }
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-cal-world-strip { border-top-color: rgba(255, 255, 255, 0.12); }
+
+/* An OK stays the white pill it is on black, its text black. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-pill-white { background-color: #ffffff; box-shadow: none; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-pill-white:hover { background-color: rgba(255, 255, 255, 0.86); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-pill-white:active { background-color: rgba(255, 255, 255, 0.72); }
+
+/* GNOME's accent: an answer (Allow, Run, Join), a toggle that is on, the scrubber, the caret; an OK stays white. */
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-pill-accent,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-run,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-pill-decision,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-send,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-call-control:checked,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-mode-toggle.on,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-world-toggle:checked,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-dnd-toggle:checked {
+  color: #ffffff;
+  background-color: #3584e4;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-pill-accent:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-run:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-pill-decision:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-voice-send:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-call-control:checked:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-mode-toggle.on:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-cal-world-toggle:checked:hover,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-dnd-toggle:checked:hover { background-color: #4a90e8; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-pill-accent:active,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-run:active,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-pill-decision:active,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-mode-toggle.on:active { background-color: #2a76d3; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-card-run .thepuchnotch-card-key { color: rgba(255, 255, 255, 0.7); }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-slider-fill { background-color: #3584e4; }
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-entry,
+#thepuchnotchIsland.thepuchnotch-translucent .thepuchnotch-stepper-entry { caret-color: #3584e4; selection-background-color: #3584e4; }
+
+/* GNOME 47 and later: the accent the user picked in Settings → Appearance (controller.js adds the class). */
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-pill-accent,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-card-run,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-pill-decision,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-voice-send,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-call-control:checked,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-mode-toggle.on,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-cal-world-toggle:checked,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-dnd-toggle:checked,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-slider-fill { color: -st-accent-fg-color; background-color: -st-accent-color; }
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-pill-accent:hover,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-card-run:hover,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-pill-decision:hover,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-voice-send:hover,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-call-control:checked:hover,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-mode-toggle.on:hover,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-cal-world-toggle:checked:hover,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-dnd-toggle:checked:hover { background-color: st-lighten(-st-accent-color, 5%); }
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-pill-accent:active,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-card-run:active,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-pill-decision:active,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-mode-toggle.on:active { background-color: st-darken(-st-accent-color, 5%); }
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-entry,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-stepper-entry { caret-color: -st-accent-color; selection-background-color: -st-accent-color; }
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-entry:focus { box-shadow: inset 0 0 0 2px st-transparentize(-st-accent-color, 0.3) !important; }
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-voice-entry,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-voice-entry:focus:hover,
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-reminder-field { selection-background-color: st-transparentize(-st-accent-color, 0.4); }
+#thepuchnotchIsland.thepuchnotch-accent-system .thepuchnotch-cal-accounts { color: st-lighten(-st-accent-color, 25%); }
+
+/* Dark tint: the accent flat, as GNOME's own toggles. */
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-pill-accent,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-card-run,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-pill-decision,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-voice-send,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-call-control:checked,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-mode-toggle.on,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-cal-world-toggle:checked,
+#thepuchnotchIsland.thepuchnotch-glass-dark .thepuchnotch-dnd-toggle:checked { box-shadow: none; }
+
+/* Prayer times: a compact five-column timetable and a single upcoming prayer. */
+.thepuchnotch-prayer { spacing: 8px; }
+.thepuchnotch-prayer-title { font-size: 13px; font-weight: 600; }
+.thepuchnotch-prayer-next { font-size: 18px; font-weight: 600; }
+.thepuchnotch-prayer-times { spacing: 8px; }
+.thepuchnotch-prayer-cell { padding: 8px 10px; spacing: 3px; border-radius: 10px; background-color: rgba(255,255,255,0.06); }
+.thepuchnotch-prayer-upcoming { background-color: rgba(87,192,155,0.23); }
+.thepuchnotch-prayer-name { font-size: 11px; color: rgba(255,255,255,0.75); }
+.thepuchnotch-prayer-time { font-size: 17px; font-weight: 600; }
+.thepuchnotch-prayer-source { font-size: 10px; color: rgba(255,255,255,0.65); }
+
+/* A single sung line; the compact view measures and bounds its width. */
+.thepuchnotch-compact-lyric { font-size: 13px; font-weight: 600; text-align: center; }
+
+.thepuchnotch-reply { spacing: 8px; padding: 12px; border-top: 1px solid rgba(255,255,255,0.12); }

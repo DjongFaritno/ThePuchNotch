@@ -1,0 +1,27 @@
+pkgbase = thepuchnotch-bin
+	pkgdesc = A notch-style island for the GNOME Shell top bar: music with synced lyrics, calls, a focus timer, a calendar, a file shelf, app usage and a voice assistant
+	pkgver = 1.9.0
+	pkgrel = 1
+	url = https://github.com/DjongFaritno/ThePuchNotch
+	install = thepuchnotch-bin.install
+	arch = x86_64
+	license = GPL-3.0-or-later
+	license = OFL-1.1
+	depends = gnome-shell>=1:46
+	depends = dconf
+	depends = gtk4
+	depends = glib2
+	depends = pango
+	depends = gdk-pixbuf2
+	depends = gcc-libs
+	depends = glibc
+	depends = bash
+	optdepends = vulkan-icd-loader: speech recognition on the graphics card, else on the processor
+	provides = thepuchnotch
+	conflicts = thepuchnotch
+	options = !strip
+	options = !debug
+	source_x86_64 = thepuchnotch-1.9.0-x86_64-linux.tar.gz
+	sha256sums_x86_64 = GENERATE_WITH_UPDATE_SH
+
+pkgname = thepuchnotch-bin

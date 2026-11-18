@@ -1,0 +1,15 @@
+post_install() {
+  echo 'Log out and back in, then turn thepuchnotch on once as each user (in the Extensions app, or):'
+  echo '  gnome-extensions enable thepuchnotch@DjongFaritno.github.io'
+  echo 'For the voice assistant, each user also runs thepuchnotch-setup-voice once.'
+}
+
+post_upgrade() {
+  echo 'Log out and back in so GNOME Shell loads the new thepuchnotch.'
+}
+
+pre_remove() {
+  echo "thepuchnotch's alert hooks stay in Claude Code's and Codex's settings, calling the removed thepuchnotchd."
+  echo "Each user who ran thepuchnotch runs 'thepuchnotchd --unhook-all' before removing thepuchnotch-bin"
+  echo "(afterwards: reinstall it, run that, then remove it again)."
+}

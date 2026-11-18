@@ -1,0 +1,9 @@
+ThePuchNotch is a fork of Isle by zickrian.
+Original project: https://github.com/zickrian/isle
+Fork: https://github.com/DjongFaritno/ThePuchNotch
+
+Original copyright notices and the GPL-3.0-or-later license are retained.
+ThePuchNotch branding and modifications are maintained by DjongFaritno.
+Original assistant shapes acknowledge bloub by Jérémy Perret (MIT);
+see the attribution in gnome-extension/src/bot.js and bundled licenses.
+Inter retains its bundled font license. Third-party notices remain in their files.

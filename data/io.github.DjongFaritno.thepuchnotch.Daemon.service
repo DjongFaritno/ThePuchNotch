@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=io.github.DjongFaritno.thepuchnotch.Daemon
+Exec=@BINDIR@/thepuchnotchd
+SystemdService=thepuchnotchd.service

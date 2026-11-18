@@ -1,0 +1,48 @@
+# Maintainer: DjongFaritno
+# thepuchnotch from its release tarball, with the programs GitHub Actions built. After a release,
+# `./update.sh <version>` sets the version and checksum here and in .SRCINFO.
+
+pkgname=thepuchnotch-bin
+pkgver=1.9.0
+pkgrel=1
+pkgdesc='A notch-style island for the GNOME Shell top bar: music with synced lyrics, calls, a focus timer, a calendar, a file shelf, app usage and a voice assistant'
+arch=('x86_64')
+url='https://github.com/DjongFaritno/ThePuchNotch'
+license=('GPL-3.0-or-later' 'OFL-1.1')
+depends=('gnome-shell>=1:46' 'dconf' 'gtk4' 'glib2' 'pango' 'gdk-pixbuf2' 'gcc-libs' 'glibc' 'bash')
+optdepends=('vulkan-icd-loader: speech recognition on the graphics card, else on the processor')
+provides=('thepuchnotch')
+conflicts=('thepuchnotch')
+options=('!strip' '!debug')
+install=thepuchnotch-bin.install
+source_x86_64=("thepuchnotch-$pkgver-$CARCH-linux.tar.gz")
+sha256sums_x86_64=('GENERATE_WITH_UPDATE_SH')
+
+package() {
+  cd "thepuchnotch-$pkgver-$CARCH-linux"
+  local uuid=thepuchnotch@DjongFaritno.github.io
+
+  install -Dm755 -t "$pkgdir/usr/bin" bin/thepuchnotchd bin/thepuchnotch-shelf bin/thepuchnotch-whisper scripts/thepuchnotch-charge-limit
+  install -Dm755 scripts/setup-voice.sh "$pkgdir/usr/bin/thepuchnotch-setup-voice"
+
+  local ext="$pkgdir/usr/share/gnome-shell/extensions/$uuid"
+  install -d "$ext"
+  cp -r --no-preserve=ownership gnome-extension/. "$ext/"
+  # The settings schema goes where the system compiles it; the extension then finds it there.
+  install -Dm644 -t "$pkgdir/usr/share/glib-2.0/schemas" "$ext"/schemas/*.gschema.xml
+  rm -r "$ext/schemas"
+  chmod -R u=rwX,go=rX "$ext"
+
+  local service
+  for service in io.github.DjongFaritno.thepuchnotch.Daemon.service io.github.DjongFaritno.thepuchnotch.ShelfWindow.service thepuchnotchd.service; do
+    sed -e 's|@BINDIR@|/usr/bin|' -e 's|file://%h/.local/share/doc/thepuchnotch|file:///usr/share/doc/thepuchnotch|' \
+      "data/$service" > "$srcdir/$service"
+  done
+  install -Dm644 -t "$pkgdir/usr/share/dbus-1/services" \
+    "$srcdir/io.github.DjongFaritno.thepuchnotch.Daemon.service" "$srcdir/io.github.DjongFaritno.thepuchnotch.ShelfWindow.service"
+  install -Dm644 -t "$pkgdir/usr/lib/systemd/user" "$srcdir/thepuchnotchd.service"
+
+  install -Dm644 -t "$pkgdir/usr/share/fonts/thepuchnotch" data/fonts/InterVariable.ttf
+  install -Dm644 -t "$pkgdir/usr/share/licenses/$pkgname" LICENSE data/fonts/Inter-LICENSE.txt
+  install -Dm644 -t "$pkgdir/usr/share/doc/thepuchnotch" README.md CHANGELOG.md
+}
